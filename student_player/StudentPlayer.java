@@ -29,6 +29,8 @@ public class StudentPlayer extends SaboteurPlayer {
     	long current = System.currentTimeMillis();
     	Tree tree = new Tree(boardState);
     	Node rootNode = tree.getRoot();
+    	
+    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
     	while (current - System.currentTimeMillis() < 2000) {
     		
     		// Selection
@@ -63,12 +65,8 @@ public class StudentPlayer extends SaboteurPlayer {
     	
     	tree.setRoot(picked_node);
     	
-    	Move myMove = ;
+    	Move myMove = picked_node.getMovePlayed();
     	
-    	// TODO: If time expired and haven't picked a move, have to pick random move (or is it handled by the game?)
-        myMove = boardState.getRandomMove();
-       
-
         // Return your move to be processed by the server.
         return myMove;
     }
