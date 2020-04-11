@@ -95,9 +95,11 @@ public class SaboteurBoardStateClone extends BoardState {
 			for (SaboteurCard card : player1Cards) {
 				deck.remove(card);
 			}
-			// opponent's cards are the rest of the deck
-			this.player2Cards = deck;
-
+	        //initialize the players hands:
+	        this.player2Cards = new ArrayList<SaboteurCard>();
+	        for(int i=0;i<7;i++){
+	            this.player2Cards.add(this.Deck.remove(0));
+	        }
 		}
 		else {
 			this.player2Cards = boardState.getCurrentPlayerCards();
@@ -105,8 +107,10 @@ public class SaboteurBoardStateClone extends BoardState {
 			for (SaboteurCard card : player2Cards) {
 				deck.remove(card);
 			}
-			// opponent's cards are the rest of the deck
-			this.player1Cards = deck;
+	        this.player1Cards = new ArrayList<SaboteurCard>();
+	        for(int i=0;i<7;i++){
+	            this.player1Cards.add(this.Deck.remove(0));
+	        }
 		}
 		winner = Board.NOBODY;
 		turnPlayer = boardState.getTurnPlayer();
@@ -163,9 +167,11 @@ public class SaboteurBoardStateClone extends BoardState {
 			for (SaboteurCard card : player1Cards) {
 				deck.remove(card);
 			}
-			// opponent's cards are the rest of the deck
-			this.player2Cards = deck;
-
+	        //initialize the players hands:
+	        this.player2Cards = new ArrayList<SaboteurCard>();
+	        for(int i=0;i<7;i++){
+	            this.player2Cards.add(this.Deck.remove(0));
+	        }
 		}
 		else {
 			this.player2Cards = boardState.getCurrentPlayerCards();
@@ -173,8 +179,10 @@ public class SaboteurBoardStateClone extends BoardState {
 			for (SaboteurCard card : player2Cards) {
 				deck.remove(card);
 			}
-			// opponent's cards are the rest of the deck
-			this.player1Cards = deck;
+	        this.player1Cards = new ArrayList<SaboteurCard>();
+	        for(int i=0;i<7;i++){
+	            this.player1Cards.add(this.Deck.remove(0));
+	        }
 		}
 		winner = Board.NOBODY;
 		turnPlayer = boardState.getTurnPlayer();
@@ -595,7 +603,9 @@ public class SaboteurBoardStateClone extends BoardState {
 	}
 
 	public void processMove(SaboteurMove m) throws IllegalArgumentException {
-
+		System.out.println("Player ID Process: " + m.getPlayerID() + " Turn Player Process: " + this.getTurnPlayer());
+		if (m.getPlayerID() == Integer.MAX_VALUE) turnPlayer = 0;
+		else turnPlayer = 1;
 		if(m.getFromBoard()){
 			//            this.initializeFromStringForInitialCopy(m.getBoardInit());
 			System.out.println("inititalized"+this.hashCode());
@@ -628,6 +638,7 @@ public class SaboteurBoardStateClone extends BoardState {
 		if(testCard instanceof SaboteurTile){
 			this.board[pos[0]][pos[1]] = new SaboteurTile(((SaboteurTile) testCard).getIdx());
 			if(turnPlayer==1){
+				System.out.println("OYYYY");
 				//Remove from the player card the card that was used.
 				for(SaboteurCard card : this.player1Cards) {
 					if (card instanceof SaboteurTile) {
@@ -642,9 +653,11 @@ public class SaboteurBoardStateClone extends BoardState {
 					}
 				}
 			}
-			else {
+			else if (turnPlayer ==0){
 				for (SaboteurCard card : this.player2Cards) {
 					if (card instanceof SaboteurTile) {
+						System.out.println("AAYYYY");
+
 						if (((SaboteurTile) card).getIdx().equals(((SaboteurTile) testCard).getIdx())) {
 							this.player2Cards.remove(card);
 							break; //leave the loop....
@@ -890,6 +903,7 @@ public class SaboteurBoardStateClone extends BoardState {
 
 	@Override
 	public boolean gameOver() {
+//		System.out.println("Deck Size: " + this.Deck.size() + " Player 1: " + this.player1Cards.size() + "Player 2: " + this.player2Cards.size());
 		return this.Deck.size()==0 && this.player1Cards.size()==0 && this.player2Cards.size()==0 || winner != Board.NOBODY;
 	}
 

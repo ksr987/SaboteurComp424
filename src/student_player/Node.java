@@ -13,7 +13,7 @@ public class Node {
     SaboteurBoardStateClone state;
     SaboteurMove movePlayed;
     int visitCount;
-    int winScore;
+    double winScore;
     
     public Node(SaboteurBoardStateClone state) {
         this.state = state;
@@ -64,15 +64,15 @@ public class Node {
     }
     
 
-	public int getWinScore() {
+	public double getWinScore() {
 		return winScore;
 	}
 	
 	public SaboteurMove getMovePlayed() {
 		return this.movePlayed;
 	}
-	public void setWinScore(int score) {
-		this.winScore = score;
+	public void setWinScore(double d) {
+		this.winScore = d;
 	}
 
 	public int getVisitCount() {

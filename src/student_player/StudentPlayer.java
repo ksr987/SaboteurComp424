@@ -55,7 +55,7 @@ public class StudentPlayer extends SaboteurPlayer {
     			int random_index = (int) (childArray.size() * Math.random());
     			simulation_node = childArray.get(random_index);
     		}
-    		int playoutResult = MyTools.MCTS_Simulation(simulation_node);
+    		double playoutResult = MyTools.MCTS_Simulation(simulation_node);
     		
     		// Backpropagation
     		MyTools.MCTS_Backpropagation(simulation_node, playoutResult);
