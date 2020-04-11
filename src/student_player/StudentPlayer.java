@@ -39,8 +39,8 @@ public class StudentPlayer extends SaboteurPlayer {
     	
     	int i = 0;
     	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-    	while (current - System.currentTimeMillis() < 2000) {
-    		System.out.println("Iteration " + i);
+    	while (System.currentTimeMillis() - current < 1900) {
+//    		System.out.println("Iteration " + i);
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
     		

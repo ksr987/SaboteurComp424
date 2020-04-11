@@ -41,7 +41,7 @@ public class MyTools {
 		Node parentNode = rootNode;
 
 		// while we still haven't reached a leaf...
-		while(parentNode.getChildArray() !=null) {
+		while(! parentNode.getChildArray().isEmpty()) {
 
 			double max_uct = 0;
 			Node currentNode = parentNode;
@@ -65,16 +65,19 @@ public class MyTools {
 		}
 		return parentNode;
 	}
-	
+
 	public static void MCTS_Expansion(Node selectedNode) {
 		ArrayList<SaboteurMove> legal_moves = selectedNode.getState().getAllLegalMoves();
 		for (SaboteurMove move : legal_moves) {
 			SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(selectedNode.getState());
+			System.out.println("EXPANSION Cloned: " + clonedState.getTurnPlayer());
+			System.out.println("EXPANSION Original: " + selectedNode.getState().getTurnPlayer());
+
 			try {
 				clonedState.processMove(move);
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println(Arrays.deepToString(clonedState.getHiddenBoard()).replace("], ", "]\n"));
+//				System.out.println(Arrays.deepToString(clonedState.getHiddenBoard()).replace("], ", "]\n"));
 			}
 			Node node = new Node(clonedState, selectedNode, move);
 			selectedNode.getChildArray().add(node);
@@ -88,10 +91,17 @@ public class MyTools {
 		while(! clonedState.gameOver()) {
 			ArrayList<SaboteurMove> legal_moves = clonedState.getAllLegalMoves();
 			int random_index = (int) (Math.random() * legal_moves.size());
-//			System.out.println(legal_moves.size());
+
+			SaboteurCard card = legal_moves.get(random_index).getCardPlayed();
+//			int id = 1 - legal_moves.get(random_index).getPlayerID();
+			int id = clonedState.getTurnPlayer();
+
+			int[] pos = legal_moves.get(random_index).getPosPlayed();
+			SaboteurMove newMove = new SaboteurMove(card, pos[0], pos[1], id);
+			//			System.out.println(legal_moves.size());
 			SaboteurMove entry = legal_moves.get(random_index);
 			System.out.println("Player ID: " + entry.getPlayerID());
-			clonedState.processMove(legal_moves.get(random_index));
+			clonedState.processMove(newMove);
 //			System.out.println(clonedState.getTurnPlayer());
 		}
 		int winner = clonedState.getWinner();
@@ -104,7 +114,7 @@ public class MyTools {
 		Node tempNode = currentNode;
 		while (tempNode != null) {
 			tempNode.setVisitCount(tempNode.getVisitCount() + 1);
-			
+
 			if(playoutResult==0.5) {
 				tempNode.setWinScore(tempNode.getWinScore()+0.5);
 			}

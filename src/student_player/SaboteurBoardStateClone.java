@@ -603,9 +603,11 @@ public class SaboteurBoardStateClone extends BoardState {
 	}
 
 	public void processMove(SaboteurMove m) throws IllegalArgumentException {
-		System.out.println("Player ID Process: " + m.getPlayerID() + " Turn Player Process: " + this.getTurnPlayer());
-		if (m.getPlayerID() == Integer.MAX_VALUE) turnPlayer = 0;
-		else turnPlayer = 1;
+//		System.out.println("Player ID Process: " + m.getPlayerID() + " Turn Player Process: " + this.getTurnPlayer());
+		System.out.println("TurnPlayerBefore: " + turnPlayer);
+		turnPlayer = m.getPlayerID();
+		System.out.println("TurnPlayerAfter: " + turnPlayer);
+
 		if(m.getFromBoard()){
 			//            this.initializeFromStringForInitialCopy(m.getBoardInit());
 			System.out.println("inititalized"+this.hashCode());
@@ -653,7 +655,7 @@ public class SaboteurBoardStateClone extends BoardState {
 					}
 				}
 			}
-			else if (turnPlayer ==0){
+			else {
 				for (SaboteurCard card : this.player2Cards) {
 					if (card instanceof SaboteurTile) {
 						System.out.println("AAYYYY");
@@ -767,6 +769,8 @@ public class SaboteurBoardStateClone extends BoardState {
 		this.draw();
 		this.updateWinner();
 		turnPlayer = 1 - turnPlayer; // Swap player
+//		turnPlayer = 1 - m.getPlayerID(); // Swap player
+
 		turnNumber++;
 	}
 
