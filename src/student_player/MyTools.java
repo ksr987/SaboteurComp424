@@ -22,7 +22,7 @@ public class MyTools {
 	public static final int[][] hiddenPos = {{originPos+7,originPos-2},{originPos+7,originPos},{originPos+7,originPos+2}};
 
 	public void findHiddenPos(Node selectedNode) {
-		SaboteurTile[][] tiles = selectedNode.getState().getUpdatedHiddenBoard();
+		SaboteurTile[][] tiles = selectedNode.getState().getHiddenBoard();
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				// -1 means empty i.e. hidden objective found
@@ -74,7 +74,7 @@ public class MyTools {
 				clonedState.processMove(move);
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println(Arrays.deepToString(clonedState.getUpdatedHiddenBoard()).replace("], ", "]\n"));
+				System.out.println(Arrays.deepToString(clonedState.getHiddenBoard()).replace("], ", "]\n"));
 			}
 			Node node = new Node(clonedState, selectedNode, move);
 			selectedNode.getChildArray().add(node);
