@@ -67,8 +67,23 @@ public class SaboteurBoardStateClone extends BoardState {
 			hiddenCards[i] = new SaboteurTile("8");
 		}
 
-		this.Deck = SaboteurCard.getDeck();
-		//initialize the player effects:
+        // initialize the hidden position:
+        ArrayList<String> list =new ArrayList<String>();
+        list.add("hidden1");
+        list.add("hidden2");
+        list.add("nugget");
+        Random startRand = new Random();
+        for(int i = 0; i < 3; i++){
+            int idx = startRand.nextInt(list.size());
+            this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile(list.remove(idx));
+            this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+        }
+        //initialize the entrance
+        this.board[originPos][originPos] = new SaboteurTile("entrance");
+        //initialize the deck.
+        this.Deck = SaboteurCard.getDeck();
+        
+        //initialize the player effects:
 		player1nbMalus = 0;
 		player2nbMalus = 0;
 
@@ -120,8 +135,23 @@ public class SaboteurBoardStateClone extends BoardState {
 			hiddenCards[i] = new SaboteurTile("8");
 		}
 
-		this.Deck = SaboteurCard.getDeck();
-		//initialize the player effects:
+        // initialize the hidden position:
+        ArrayList<String> list =new ArrayList<String>();
+        list.add("hidden1");
+        list.add("hidden2");
+        list.add("nugget");
+        Random startRand = new Random();
+        for(int i = 0; i < 3; i++){
+            int idx = startRand.nextInt(list.size());
+            this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile(list.remove(idx));
+            this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+        }
+        //initialize the entrance
+        this.board[originPos][originPos] = new SaboteurTile("entrance");
+        //initialize the deck.
+        this.Deck = SaboteurCard.getDeck();
+        
+        //initialize the player effects:
 		player1nbMalus = 0;
 		player2nbMalus = 0;
 
