@@ -1,0 +1,13 @@
+# Server version 0.08 running on 192.168.2.139:8123
+# Game ID: 11
+# Board class: Saboteur.SaboteurBoard
+# Timeout: 20000
+# First Move Timeout: 30000
+# Date: Fri Apr 10 20:49:24 EDT 2020
+# Player 1: Player-0, 'Human', running on 192.168.2.139
+# Player 2: Player-1, '260732873', running on 192.168.2.139
+START Player-0 Human
+START Player-1 260732873
+BoardInit:Tile:4,Tile:7,Tile:7,Malus,Malus,Tile:10,Bonus,Tile:0,Bonus,Tile:8,Tile:0,Tile:8,Tile:8,Bonus,Tile:7,Tile:7,Tile:2,Tile:0,Tile:6,Bonus,Tile:9,Tile:11,Tile:5,Map,Map,Tile:6,Tile:5,Tile:12,Tile:7,Map,Tile:5,Destroy,Tile:9,Tile:6,Tile:9,Map,Tile:8,Tile:3,Tile:5,Map,Tile:0-Tile:10,Map,Tile:9,Tile:6,Tile:13,Tile:1,Tile:10-Tile:9,Tile:6,Tile:15,Tile:14,Destroy,Tile:8,Destroy-Tile:hidden1,Tile:nugget,Tile:hidden2
+GAMEOVER TIMEOUT WINNER 0
+# Game ended: Fri Apr 10 20:49:45 EDT 2020
