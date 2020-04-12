@@ -31,18 +31,68 @@ public class StudentPlayer extends SaboteurPlayer {
      */
     public Move chooseMove(SaboteurBoardState boardState) {
     	long current = System.currentTimeMillis();
-    	//player_id = boardState.getTurnPlayer();
     	
     	SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(boardState);
     	Tree tree = new Tree(clonedState);
     	Node rootNode = tree.getRoot();
     	
     	
-    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-    	while (current - System.currentTimeMillis() < 2000) {
+//    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
+//    	while (current - System.currentTimeMillis() < 30000) {
     		
+//    		Node rootNode = new Node(null, null, 11,21,1);
+//    		Node node1level1 = new Node(rootNode, null, 7,10,0);
+//    		Node node2level1 = new Node(rootNode, null, 0,3,0);
+//    		Node node3level1 = new Node(rootNode, null, 3,8,0);
+//    		
+//    		ArrayList<Node> children1Level1 = new ArrayList<Node>();
+//    		children1Level1.add(node1level1);
+//    		children1Level1.add(node2level1);
+//    		children1Level1.add(node3level1);
+//    		
+//    		rootNode.childArray = children1Level1;
+//    		
+//    		Tree tree = new Tree(rootNode);
+//    		
+//    		Node node1level2 = new Node(node1level1, null, 2,4,1);
+//    		Node node2level2 = new Node(node1level1, null, 1,6,1);
+//    		
+//    		ArrayList<Node> children1Level2 = new ArrayList<Node>();
+//    		children1Level2.add(node1level2);
+//    		children1Level2.add(node2level2);
+//    		
+//    		node1level1.childArray = children1Level2;
+//    		
+//    		Node node3level2 = new Node(node3level1, null, 1,2,1);
+//    		Node node4level2 = new Node(node3level1, null, 2,3,1);
+//    		Node node5level2 = new Node(node3level1, null, 2,3,1);
+//    		
+//    		ArrayList<Node> children2Level2 = new ArrayList<Node>();
+//    		children2Level2.add(node3level2);
+//    		children2Level2.add(node4level2);
+//    		children2Level2.add(node5level2);
+//    		
+//    		node3level1.childArray = children2Level2;
+//    		
+//    		Node node1level3 = new Node(node2level2, null, 2,3,0);
+//    		Node node2level3 = new Node(node2level2, null, 3,3,0);
+//    		
+//    		ArrayList<Node> children1Level3 = new ArrayList<Node>();
+//    		children1Level3.add(node1level3);
+//    		children1Level3.add(node2level3);
+//    		
+//    		node2level2.childArray = children1Level3;
+//    		
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
+//    		
+//    		Node node1level4 = new Node(node2level3, null, 0,0,1);
+//    		
+//    		ArrayList<Node> children1Level4 = new ArrayList<Node>();
+//    		children1Level4.add(node1level4);
+//    		
+//    		node2level3.childArray = children1Level4;
+    		
     		
     		// Expansion
     		if (!selectedNode.state.gameOver()) {
@@ -55,13 +105,22 @@ public class StudentPlayer extends SaboteurPlayer {
     			int random_index = (int) (childArray.size() * Math.random());
     			simulation_node = childArray.get(random_index);
     		}
-    		int playoutResult = MyTools.MCTS_Simulation(simulation_node);
+    		
+    		double playoutResult = MyTools.MCTS_Simulation(simulation_node);
     		
     		// Backpropagation
     		MyTools.MCTS_Backpropagation(simulation_node, playoutResult);
     		
-    	}
-    	
+//    		MyTools.MCTS_Backpropagation(node1level4, 1);
+    		
+//    		System.out.println(node1level4.visitCount + " " + node1level4.winScore);
+//    		System.out.println(node2level3.visitCount + " " + node2level3.winScore);
+//    		System.out.println(node2level2.visitCount + " " + node2level2.winScore);
+//    		System.out.println(node1level1.visitCount + " " + node1level1.winScore);
+//    		System.out.println(rootNode.visitCount + " " + rootNode.winScore);
+//    		
+//    	}
+//    	
     	// Get child with maximum score
     	List<Node> root_children = rootNode.getChildArray();
     	Node picked_node = root_children.get(0);
