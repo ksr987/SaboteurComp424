@@ -3,9 +3,7 @@ package student_player;
 import java.util.ArrayList;
 import java.util.List;
 
-import Saboteur.SaboteurBoardState;
 import Saboteur.SaboteurMove;
-import Saboteur.cardClasses.SaboteurCard;
 
 public class Node {
     Node parent;
@@ -14,6 +12,18 @@ public class Node {
     SaboteurMove movePlayed;
     int visitCount;
     double winScore;
+    
+//    public Node(Node parent, List<Node> childArray, int winScore, int visitCount, int turn) {
+//    	
+//    	this.parent = parent;
+//    	this.visitCount = visitCount;
+//    	this.winScore = winScore;
+//    	
+//    	if(childArray !=null) {
+//    		this.childArray = new ArrayList<Node>(childArray);
+//    	}
+//    	
+//    }
     
     public Node(SaboteurBoardStateClone state) {
         this.state = state;
@@ -71,8 +81,8 @@ public class Node {
 	public SaboteurMove getMovePlayed() {
 		return this.movePlayed;
 	}
-	public void setWinScore(double d) {
-		this.winScore = d;
+	public void setWinScore(double score) {
+		this.winScore = score;
 	}
 
 	public int getVisitCount() {

@@ -4,17 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import Saboteur.SaboteurMove;
-import Saboteur.cardClasses.SaboteurBonus;
-import Saboteur.cardClasses.SaboteurCard;
-import Saboteur.cardClasses.SaboteurDestroy;
-import Saboteur.cardClasses.SaboteurDrop;
-import Saboteur.cardClasses.SaboteurMalus;
-import Saboteur.cardClasses.SaboteurMap;
 import Saboteur.cardClasses.SaboteurTile;
 
 public class MyTools {
-
-
+	
 	public static final int originPos = 5;
 
 	public static final ArrayList<int[]> hiddenPosDynamic = new ArrayList<int[]>();
@@ -41,7 +34,7 @@ public class MyTools {
 		Node parentNode = rootNode;
 
 		// while we still haven't reached a leaf...
-		while(! parentNode.getChildArray().isEmpty()) {
+		while(!parentNode.getChildArray().isEmpty()) {
 
 			double max_uct = 0;
 			Node currentNode = parentNode;
@@ -67,21 +60,24 @@ public class MyTools {
 	}
 
 	public static void MCTS_Expansion(Node selectedNode) {
-		ArrayList<SaboteurMove> legal_moves = selectedNode.getState().getAllLegalMoves();
+		SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(selectedNode.getState());
+		ArrayList<SaboteurMove> legal_moves = clonedState.getAllLegalMoves();
+		//System.out.println("Legal Moves size: " + legal_moves.size());
 		for (SaboteurMove move : legal_moves) {
-			SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(selectedNode.getState());
-			System.out.println("EXPANSION Cloned: " + clonedState.getTurnPlayer());
-			System.out.println("EXPANSION Original: " + selectedNode.getState().getTurnPlayer());
-
 			try {
-				clonedState.processMove(move);
+				clonedState = new SaboteurBoardStateClone(selectedNode.getState());
+				SaboteurBoardStateClone newClonedState = clonedState.processMove(move);
+				Node node = new Node(newClonedState, selectedNode, move);
+				selectedNode.getChildArray().add(node);
+				//System.out.println(move.toPrettyString());
 			} catch (Exception e) {
 				e.printStackTrace();
-//				System.out.println(Arrays.deepToString(clonedState.getHiddenBoard()).replace("], ", "]\n"));
+				//System.out.println(Arrays.deepToString(clonedState.getHiddenBoard()).replace("], ", "]\n"));
 			}
-			Node node = new Node(clonedState, selectedNode, move);
-			selectedNode.getChildArray().add(node);
+			
 		}
+		
+	
 	}
 
 	public static double MCTS_Simulation(Node currentNode) {
@@ -91,30 +87,22 @@ public class MyTools {
 		while(! clonedState.gameOver()) {
 			ArrayList<SaboteurMove> legal_moves = clonedState.getAllLegalMoves();
 			int random_index = (int) (Math.random() * legal_moves.size());
+			//System.out.println("Legal moves size:" + legal_moves.size());
+			clonedState = clonedState.processMove(legal_moves.get(random_index));
 
-			SaboteurCard card = legal_moves.get(random_index).getCardPlayed();
-//			int id = 1 - legal_moves.get(random_index).getPlayerID();
-			int id = clonedState.getTurnPlayer();
-
-			int[] pos = legal_moves.get(random_index).getPosPlayed();
-			SaboteurMove newMove = new SaboteurMove(card, pos[0], pos[1], id);
-			//			System.out.println(legal_moves.size());
-			SaboteurMove entry = legal_moves.get(random_index);
-			System.out.println("Player ID: " + entry.getPlayerID());
-			clonedState.processMove(newMove);
-//			System.out.println(clonedState.getTurnPlayer());
 		}
 		int winner = clonedState.getWinner();
 		if (winner == currentNode.getState().getTurnPlayer()) return 1;	// our player won
 		else if (winner == Integer.MAX_VALUE) return 0.5;	// it's a draw
 		else return 0;
+	
 	}
 
 	public static void MCTS_Backpropagation(Node currentNode, double playoutResult) {
 		Node tempNode = currentNode;
 		while (tempNode != null) {
 			tempNode.setVisitCount(tempNode.getVisitCount() + 1);
-
+			
 			if(playoutResult==0.5) {
 				tempNode.setWinScore(tempNode.getWinScore()+0.5);
 			}
