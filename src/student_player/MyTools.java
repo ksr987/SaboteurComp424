@@ -146,10 +146,12 @@ public class MyTools {
 
 	public static Node MCTS_Selection(Node rootNode) {
 		Node parentNode = rootNode;
+//		int i =0;
 
 		// while we still haven't reached a leaf...
 		while(parentNode.getChildArray().size()>0) {
-
+//			boolean shouldExitLoop = true;
+//			i++;
 			double max_uct = 0;
 			Node currentNode = parentNode;
 
@@ -167,9 +169,13 @@ public class MyTools {
 				if (uct > max_uct) {
 					max_uct = uct;
 					currentNode = node;
+//					shouldExitLoop = false;
 				}
 			}
 			parentNode = currentNode;
+//			if(shouldExitLoop==true) {
+//				return parentNode;
+//			}
 		}
 		return parentNode;
 	}
