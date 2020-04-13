@@ -61,7 +61,7 @@ public class MyTools {
 		 * that can be played from the opponent and those that can be drawn. 
 		 */
 
-		// TODO: Destroy the cards that are playing outwards, giving more priority to the tiles closer to hidden objective
+		// Destroy the cards that are playing outwards, giving more priority to the tiles closer to hidden objective
 		else if (cardPlayed instanceof SaboteurDestroy) {
 
 			int xpos = move.getPosPlayed()[0];
@@ -95,7 +95,7 @@ public class MyTools {
 		return 0;
 	}
 
-	// TODO: This method identifies whether the card played is going inwards i.e. towards 
+	// This method identifies whether the card played is going inwards i.e. towards 
 	// the hidden objectives. At least one of its extremes should be inside of the "square" formed by the entrace and hidden tiles
 
 	private static boolean playedInwards(SaboteurMove move, SaboteurBoardStateClone boardState) {
@@ -148,6 +148,7 @@ public class MyTools {
 		Node parentNode = rootNode;
 		// while we still haven't reached a leaf...
 		while(!parentNode.getChildArray().isEmpty()) {
+//			boolean shouldExitLoop = true;
 			double max_uct = 0;
 			Node currentNode = parentNode;
 
@@ -164,9 +165,13 @@ public class MyTools {
 				if (uct > max_uct) {
 					max_uct = uct;
 					currentNode = node;
+//					shouldExitLoop = false;
 				}
 			}
 			parentNode = currentNode;
+//			if (shouldExitLoop == true) {
+//				return parentNode;
+//			}
 		}
 		return parentNode;
 	}
