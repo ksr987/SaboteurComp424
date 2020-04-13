@@ -41,7 +41,7 @@ public class StudentPlayer extends SaboteurPlayer {
     	Node rootNode = tree.getRoot();
     	
 //    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-    	while (System.currentTimeMillis() - initial < (timeout * 950)) {
+    	while (System.currentTimeMillis() - initial < (timeout * 900)) {
     				
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
@@ -54,8 +54,17 @@ public class StudentPlayer extends SaboteurPlayer {
     		Node simulation_node = selectedNode;
     		if (selectedNode.getChildArray().size() > 0) {
     			List<Node> childArray = selectedNode.getChildArray();
-    			int random_index = (int) (childArray.size() * Math.random());
-    			simulation_node = childArray.get(random_index);
+    			double maxHeuristic = Integer.MIN_VALUE;
+    			Node maxNode = childArray.get(0);
+    			for(Node node: childArray) {
+    				if(node.heuristic >maxHeuristic) {
+    					maxHeuristic = node.heuristic;
+    					maxNode = node;
+    				}
+    			}
+    			System.out.println(maxNode.heuristic);
+    			//int random_index = (int) (childArray.size() * Math.random());
+    			simulation_node = maxNode;
     		}
     		
     		double playoutResult = MyTools.MCTS_Simulation(simulation_node);

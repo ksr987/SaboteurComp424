@@ -99,6 +99,21 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 
+//		for(int i=0;i<hiddenCards.length;i++) {
+//			hiddenCards[i] = new SaboteurTile("8");
+//		}
+//
+//        // initialize the hidden position:
+//        ArrayList<String> list =new ArrayList<String>();
+//        list.add("hidden1");
+//        list.add("hidden2");
+//        list.add("nugget");
+//        Random startRand = new Random();
+//        for(int i = 0; i < 3; i++){
+//            int idx = startRand.nextInt(list.size());
+//            this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile(list.remove(idx));
+//            this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+//        }
 
 		//initialize the entrance
 		this.board[originPos][originPos] = new SaboteurTile("entrance");
@@ -204,7 +219,7 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 		
-		// hidden tiles revealed
+//		// hidden tiles revealed
 		for(int i = 0; i < 3; i++){
 			String index = clonedBoard[hiddenPos[i][0]][hiddenPos[i][1]].getIdx();
 			if (index != "goalTile") {
@@ -216,7 +231,21 @@ public class SaboteurBoardStateClone extends BoardState {
 				}
 			}
 		}
-
+//		for(int i=0;i<hiddenCards.length;i++) {
+//			hiddenCards[i] = new SaboteurTile("8");
+//		}
+//
+//        // initialize the hidden position:
+//        ArrayList<String> list =new ArrayList<String>();
+//        list.add("hidden1");
+//        list.add("hidden2");
+//        list.add("nugget");
+//        Random startRand = new Random();
+//        for(int i = 0; i < 3; i++){
+//            int idx = startRand.nextInt(list.size());
+//            this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile(list.remove(idx));
+//            this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+//        }
 
 		//initialize the entrance
 		this.board[originPos][originPos] = new SaboteurTile("entrance");
@@ -986,7 +1015,7 @@ public class SaboteurBoardStateClone extends BoardState {
 				}
 			}
 			else{
-				System.out.println("hidden already revealed");
+//				System.out.println("hidden already revealed");
 				atLeastOnefound = true;
 			}
 		}
@@ -1019,7 +1048,7 @@ public class SaboteurBoardStateClone extends BoardState {
 	}
 
 	public void printBoard() {
-		System.out.println(this.toString());
+//		System.out.println(this.toString());
 	}
 
 	@Override

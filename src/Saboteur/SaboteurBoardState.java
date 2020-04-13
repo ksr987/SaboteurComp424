@@ -798,7 +798,7 @@ public class SaboteurBoardState extends BoardState {
             visited.add(visitingPos);
             if(usingCard) addUnvisitedNeighborToQueue(visitingPos,queue,visited,BOARD_SIZE,usingCard);
             else addUnvisitedNeighborToQueue(visitingPos,queue,visited,BOARD_SIZE*3,usingCard);
-            System.out.println(queue.size());
+//            System.out.println(queue.size());
         }
         return false;
     }

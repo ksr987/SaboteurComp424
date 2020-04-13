@@ -60,9 +60,18 @@ public class MyTools {
 		 * we are building. We can compute the most likely path since we know our cards and the cards 
 		 * that can be played from the opponent and those that can be drawn. 
 		 */
-		
+
 		// TODO: Destroy the cards that are playing outwards, giving more priority to the tiles closer to hidden objective
 		else if (cardPlayed instanceof SaboteurDestroy) {
+
+			int xpos = move.getPosPlayed()[0];
+			int ypos = move.getPosPlayed()[1];
+
+			if(boardState.getHiddenBoard()[xpos][ypos]!=null) {
+
+				if(playedInwards(move, boardState)) return -100;
+				else return 100;
+			}
 
 		}
 
@@ -70,7 +79,7 @@ public class MyTools {
 			double distance;
 			if (boardState.isNuggetFound()) {
 				int[] goldenNuggetPosition = boardState.getNuggetPosition();
-//				System.out.print("GOLDEN NUGGET FOUND");
+				//				System.out.print("GOLDEN NUGGET FOUND");
 				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - goldenNuggetPosition[0], 2) + Math.pow(move.getPosPlayed()[1] - goldenNuggetPosition[1], 2));
 			}
 
@@ -79,7 +88,7 @@ public class MyTools {
 			}
 			String idx = ((SaboteurTile) cardPlayed).getIdx();
 			int priority = map.get(idx);
-			boolean isInwards = playedInwards(((SaboteurTile) cardPlayed).getPath(), boardState);
+			boolean isInwards = playedInwards(move, boardState);
 			if (isInwards) return priority / distance;
 			return 0;
 		}
@@ -88,9 +97,36 @@ public class MyTools {
 
 	// TODO: This method identifies whether the card played is going inwards i.e. towards 
 	// the hidden objectives. At least one of its extremes should be inside of the "square" formed by the entrace and hidden tiles
-	// i.e. 
-	private static boolean playedInwards(int[][] path, SaboteurBoardStateClone boardState) {
-		return false;
+
+	private static boolean playedInwards(SaboteurMove move, SaboteurBoardStateClone boardState) {
+
+		//this method only valid for SaboteurTile instance
+		if(!(move.getCardPlayed() instanceof SaboteurTile)) return false;
+
+		int[][] tilePath = ((SaboteurTile) move.getCardPlayed()).getPath();
+		boolean topMiddleOpen = tilePath[1][2] ==1;
+		boolean leftMiddleOpen = tilePath[0][1] ==1;
+		boolean rightMiddleOpen = tilePath[2][1] ==1;
+		boolean bottomMiddleOpen = tilePath[1][0] ==1;
+
+		//left square
+		//consider only 3 edges as the common edge can be flexible
+
+		//top edge
+		if(move.getPosPlayed()[1]<=5 && !(leftMiddleOpen || rightMiddleOpen || bottomMiddleOpen) && topMiddleOpen) return false;
+
+		//left edge
+		if(move.getPosPlayed()[0]<=3 && !(topMiddleOpen || rightMiddleOpen || bottomMiddleOpen) && leftMiddleOpen) return false;
+
+		//bottom edge
+		if(move.getPosPlayed()[1]>=12 && !(topMiddleOpen || rightMiddleOpen || leftMiddleOpen) && bottomMiddleOpen) return false;
+
+		//right square
+
+		//right edge
+		if(move.getPosPlayed()[0]>=7 && !(topMiddleOpen || leftMiddleOpen || bottomMiddleOpen) && rightMiddleOpen) return false;
+
+		return true;
 	}
 
 	public static SaboteurMove findClosestMove(int[] nuggetPosition, ArrayList<SaboteurMove> legalMoves) {
@@ -110,15 +146,12 @@ public class MyTools {
 
 	public static Node MCTS_Selection(Node rootNode) {
 		Node parentNode = rootNode;
-
 		// while we still haven't reached a leaf...
 		while(!parentNode.getChildArray().isEmpty()) {
-
 			double max_uct = 0;
 			Node currentNode = parentNode;
 
 			// find the child node with maximum UCT
-
 			for (Node node : parentNode.getChildArray()) {
 				double wins = node.getWinScore();
 				int total_simulations_parent = parentNode.getVisitCount();
@@ -149,7 +182,7 @@ public class MyTools {
 				SaboteurBoardStateClone newClonedState = clonedState.processMove(move);
 				double heuristic = MyTools.evaluateGreedyMove(clonedState, move);
 				Node node = new Node(newClonedState, selectedNode, move, heuristic);
-//				System.out.println("Heuristic for " + move.getCardPlayed().getName() + " is " + heuristic);
+				//				System.out.println("Heuristic for " + move.getCardPlayed().getName() + " is " + heuristic);
 				// Here, we should be adding nodes in descending order of their heuristic so that in simulation
 				// we pick the one
 				selectedNode.getChildArray().add(node);
