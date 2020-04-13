@@ -68,7 +68,7 @@ public class SaboteurBoardStateClone extends BoardState {
 			String index = clonedBoard[hiddenPos[i][0]][hiddenPos[i][1]].getIdx();
 			if (index.equals("nugget")) {
 				this.nuggetFound = true;
-				System.out.println("NUGGET IN CONSTRUCTOR");
+//				System.out.println("NUGGET IN CONSTRUCTOR");
 				this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile("nugget");
 				this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
 			}

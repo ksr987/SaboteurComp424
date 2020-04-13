@@ -60,15 +60,17 @@ public class MyTools {
 		 * we are building. We can compute the most likely path since we know our cards and the cards 
 		 * that can be played from the opponent and those that can be drawn. 
 		 */
-		//		else if (cardPlayed instanceof SaboteurDestroy) {
-		//
-		//		}
+		
+		// TODO: Destroy the cards that are playing outwards, giving more priority to the tiles closer to hidden objective
+		else if (cardPlayed instanceof SaboteurDestroy) {
+
+		}
 
 		else if (cardPlayed instanceof SaboteurTile) {
 			double distance;
 			if (boardState.isNuggetFound()) {
 				int[] goldenNuggetPosition = boardState.getNuggetPosition();
-				System.out.print("GOLDEN NUGGET FOUND");
+//				System.out.print("GOLDEN NUGGET FOUND");
 				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - goldenNuggetPosition[0], 2) + Math.pow(move.getPosPlayed()[1] - goldenNuggetPosition[1], 2));
 			}
 
@@ -77,9 +79,18 @@ public class MyTools {
 			}
 			String idx = ((SaboteurTile) cardPlayed).getIdx();
 			int priority = map.get(idx);
-			return priority / distance;
+			boolean isInwards = playedInwards(((SaboteurTile) cardPlayed).getPath(), boardState);
+			if (isInwards) return priority / distance;
+			return 0;
 		}
 		return 0;
+	}
+
+	// TODO: This method identifies whether the card played is going inwards i.e. towards 
+	// the hidden objectives. At least one of its extremes should be inside of the "square" formed by the entrace and hidden tiles
+	// i.e. 
+	private static boolean playedInwards(int[][] path, SaboteurBoardStateClone boardState) {
+		return false;
 	}
 
 	public static SaboteurMove findClosestMove(int[] nuggetPosition, ArrayList<SaboteurMove> legalMoves) {
@@ -139,6 +150,8 @@ public class MyTools {
 				double heuristic = MyTools.evaluateGreedyMove(clonedState, move);
 				Node node = new Node(newClonedState, selectedNode, move, heuristic);
 //				System.out.println("Heuristic for " + move.getCardPlayed().getName() + " is " + heuristic);
+				// Here, we should be adding nodes in descending order of their heuristic so that in simulation
+				// we pick the one
 				selectedNode.getChildArray().add(node);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -195,9 +208,9 @@ public class MyTools {
 
 	public static void addPriorityTiles() {
 
-		String[] firstPriority = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
+		String[] firstPriority = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip", "13"};
 		String[] secondPriority = {"5_flip", "7", "9_flip", "1", "2", "2_flip"};
-		String[] thirdPriority = {"1", "2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "13", "14", "14_flip", "15"};
+		String[] thirdPriority = {"1", "2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "14", "14_flip", "15"};
 
 
 		for(String tile: firstPriority) map.put(tile, 100);
