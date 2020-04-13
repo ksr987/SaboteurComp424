@@ -41,29 +41,79 @@ public class SaboteurBoardStateClone extends BoardState {
 	private int winner;
 	private boolean nuggetFound;
 
-	public SaboteurBoardStateClone(SaboteurBoardState pbs) {
+	public SaboteurBoardStateClone(SaboteurBoardState boardState) {
+		SaboteurTile[][] clonedBoard = boardState.getBoardForDisplay();
+		int[][] clonedIntBoard = boardState.getHiddenIntBoard();
 
-		// initialize board
+		
+		// initialize cloned board
 		this.board = new SaboteurTile[BOARD_SIZE][BOARD_SIZE];
 		for (int i = 0; i < BOARD_SIZE; i++) {
-			SaboteurTile[][] display = pbs.getHiddenBoard();
-			System.arraycopy(display[i], 0, this.board[i], 0, BOARD_SIZE);
+			for (int j = 0; j < BOARD_SIZE; j++) {
+				this.board[i][j] = clonedBoard[i][j];
+			}
 		}
-
+		
 		// initialize int board
 		this.intBoard = new int[BOARD_SIZE*3][BOARD_SIZE*3];
 		for (int i = 0; i < BOARD_SIZE*3; i++) {
 			for (int j = 0; j < BOARD_SIZE*3; j++) {
-				this.intBoard[i][j] = EMPTY;
+				this.intBoard[i][j] = clonedIntBoard[i][j];
+			}
+		}
+
+		// initialize hidden cards
+		int k = 1;
+		for(int i = 0; i < 3; i++){
+			String index = clonedBoard[hiddenPos[i][0]][hiddenPos[i][1]].getIdx();
+			if (index.equals("nugget")) {
+				this.nuggetFound = true;
+				System.out.println("NUGGET IN CONSTRUCTOR");
+				this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile("nugget");
+				this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+			}
+			else {
+				if (k < 3) {
+					this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile("hidden"+k);
+					this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+					k++;
+				}
+				else {
+					this.nuggetFound = false;
+					this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile("nugget");
+					this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+				}
 			}
 		}
 		
-		// initialize deck
+		// hidden tiles revealed
+		for(int i = 0; i < 3; i++){
+			String index = clonedBoard[hiddenPos[i][0]][hiddenPos[i][1]].getIdx();
+			if (index != "goalTile") {
+				if (boardState.getTurnPlayer()==1) {
+					player1hiddenRevealed[i] = true;
+				}
+				else {
+					player2hiddenRevealed[i] = true;
+				}
+			}
+		}
+
+
+		//initialize the entrance
+		this.board[originPos][originPos] = new SaboteurTile("entrance");
+		//initialize the deck.
 		this.Deck = SaboteurCard.getDeck();
-		
-		// initialize player cards
-		if(pbs.getTurnPlayer() == 1) {
-			this.player1Cards = pbs.getCurrentPlayerCards();
+
+		//initialize the player effects:
+		player1nbMalus = 0;
+		player2nbMalus = 0;
+
+		turnPlayer = boardState.getTurnPlayer();
+		turnNumber = boardState.getTurnNumber();
+
+		if(boardState.getTurnPlayer() == 1) {
+			this.player1Cards = boardState.getCurrentPlayerCards();
 
 			ArrayList<SaboteurCard> deck = SaboteurCard.getDeck();
 			for (SaboteurCard card : player1Cards) {
@@ -76,7 +126,7 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 		else {
-			this.player2Cards = pbs.getCurrentPlayerCards();
+			this.player2Cards = boardState.getCurrentPlayerCards();
 			ArrayList<SaboteurCard> deck = SaboteurCard.getDeck();
 			for (SaboteurCard card : player2Cards) {
 				deck.remove(card);
@@ -87,35 +137,11 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 
-		// initialize hidden cards
-		for(int i = 0; i < hiddenCards.length; i++) {
-			this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
-		}
-		
-		// TODO: something about this is wrong i.e. index, 8, hidden1, etc. ?
-		for(int i = 0; i < hiddenCards.length; i++) {
-			if (hiddenCards[i].getIdx()=="8") {
-				hiddenRevealed[i] = true;
-				if (pbs.getTurnPlayer()==1) {
-					player1hiddenRevealed[i] = true;
-				}
-				else {
-					player2hiddenRevealed[i] = true;
-				}
-			}
-		}
-
-		// TODO: check this too
-		for(int i = 0; i < hiddenCards.length; i++) {
-			if(this.hiddenCards[i].getIdx().equals("nugget")) this.nuggetFound = true;
-			else this.nuggetFound = false;
-		}
-
-		this.player1nbMalus = pbs.getNbMalus(1);
-		this.player2nbMalus = pbs.getNbMalus(2);
-		this.winner = pbs.getWinner();
-		this.turnPlayer = pbs.getTurnPlayer();
-		this.turnNumber = pbs.getTurnNumber();	
+		this.player1nbMalus = boardState.getNbMalus(1);
+		this.player2nbMalus = boardState.getNbMalus(2);
+		this.winner = boardState.getWinner();
+		this.turnPlayer = boardState.getTurnPlayer();
+		this.turnNumber = boardState.getTurnNumber();	
 		this.rand = new Random(1998);
 	}
 
@@ -134,29 +160,78 @@ public class SaboteurBoardStateClone extends BoardState {
 		return this.nuggetFound;
 	}
 
-	public SaboteurBoardStateClone(SaboteurBoardStateClone pbs) {
+	public SaboteurBoardStateClone(SaboteurBoardStateClone boardState) {
+		SaboteurTile[][] clonedBoard = boardState.getBoardForDisplay();
+		int[][] clonedIntBoard = boardState.getHiddenIntBoard();
 
-		// initialize board
+		
+		// initialize cloned board
 		this.board = new SaboteurTile[BOARD_SIZE][BOARD_SIZE];
 		for (int i = 0; i < BOARD_SIZE; i++) {
-			SaboteurTile[][] display = pbs.getHiddenBoard();
-			System.arraycopy(display[i], 0, this.board[i], 0, BOARD_SIZE);
+			for (int j = 0; j < BOARD_SIZE; j++) {
+				this.board[i][j] = clonedBoard[i][j];
+			}
 		}
-
+		
 		// initialize int board
 		this.intBoard = new int[BOARD_SIZE*3][BOARD_SIZE*3];
 		for (int i = 0; i < BOARD_SIZE*3; i++) {
 			for (int j = 0; j < BOARD_SIZE*3; j++) {
-				this.intBoard[i][j] = EMPTY;
+				this.intBoard[i][j] = clonedIntBoard[i][j];
+			}
+		}
+
+		// initialize hidden cards
+		int k = 1;
+		for(int i = 0; i < 3; i++){
+			String index = clonedBoard[hiddenPos[i][0]][hiddenPos[i][1]].getIdx();
+			if (index.equals("nugget")) {
+				this.nuggetFound = true;
+				this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile("nugget");
+				this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+			}
+			else {
+				if (k < 3) {
+					this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile("hidden"+k);
+					this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+					k++;
+				}
+				else {
+					this.nuggetFound = false;
+					this.board[hiddenPos[i][0]][hiddenPos[i][1]] = new SaboteurTile("nugget");
+					this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
+				}
 			}
 		}
 		
-		// initialize deck
+		// hidden tiles revealed
+		for(int i = 0; i < 3; i++){
+			String index = clonedBoard[hiddenPos[i][0]][hiddenPos[i][1]].getIdx();
+			if (index != "goalTile") {
+				if (boardState.getTurnPlayer()==1) {
+					player1hiddenRevealed[i] = true;
+				}
+				else {
+					player2hiddenRevealed[i] = true;
+				}
+			}
+		}
+
+
+		//initialize the entrance
+		this.board[originPos][originPos] = new SaboteurTile("entrance");
+		//initialize the deck.
 		this.Deck = SaboteurCard.getDeck();
-		
-		// initialize player cards
-		if(pbs.getTurnPlayer() == 1) {
-			this.player1Cards = pbs.getCurrentPlayerCards();
+
+		//initialize the player effects:
+		player1nbMalus = 0;
+		player2nbMalus = 0;
+
+		turnPlayer = boardState.getTurnPlayer();
+		turnNumber = boardState.getTurnNumber();
+
+		if(boardState.getTurnPlayer() == 1) {
+			this.player1Cards = boardState.getCurrentPlayerCards();
 
 			ArrayList<SaboteurCard> deck = SaboteurCard.getDeck();
 			for (SaboteurCard card : player1Cards) {
@@ -169,7 +244,7 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 		else {
-			this.player2Cards = pbs.getCurrentPlayerCards();
+			this.player2Cards = boardState.getCurrentPlayerCards();
 			ArrayList<SaboteurCard> deck = SaboteurCard.getDeck();
 			for (SaboteurCard card : player2Cards) {
 				deck.remove(card);
@@ -180,35 +255,11 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 
-		// initialize hidden cards
-		for(int i = 0; i < hiddenCards.length; i++) {
-			this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
-		}
-		
-		// TODO: something about this is wrong i.e. index, 8, hidden1, etc. ?
-		for(int i = 0; i < hiddenCards.length; i++) {
-			if (hiddenCards[i].getIdx()=="8") {
-				hiddenRevealed[i] = true;
-				if (pbs.getTurnPlayer()==1) {
-					player1hiddenRevealed[i] = true;
-				}
-				else {
-					player2hiddenRevealed[i] = true;
-				}
-			}
-		}
-
-		// TODO: check this too
-		for(int i = 0; i < hiddenCards.length; i++) {
-			if(this.hiddenCards[i].getIdx().equals("nugget")) this.nuggetFound = true;
-			else this.nuggetFound = false;
-		}
-
-		this.player1nbMalus = pbs.getNbMalus(1);
-		this.player2nbMalus = pbs.getNbMalus(2);
-		this.winner = pbs.getWinner();
-		this.turnPlayer = pbs.getTurnPlayer();
-		this.turnNumber = pbs.getTurnNumber();	
+		this.player1nbMalus = boardState.getNbMalus(1);
+		this.player2nbMalus = boardState.getNbMalus(2);
+		this.winner = boardState.getWinner();
+		this.turnPlayer = boardState.getTurnPlayer();
+		this.turnNumber = boardState.getTurnNumber();	
 		this.rand = new Random(1998);
 	}
 

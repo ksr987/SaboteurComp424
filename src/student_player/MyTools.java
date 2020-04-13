@@ -138,7 +138,7 @@ public class MyTools {
 				SaboteurBoardStateClone newClonedState = clonedState.processMove(move);
 				double heuristic = MyTools.evaluateGreedyMove(clonedState, move);
 				Node node = new Node(newClonedState, selectedNode, move, heuristic);
-				System.out.println("Heuristic for " + move.getCardPlayed().getName() + " is " + heuristic);
+//				System.out.println("Heuristic for " + move.getCardPlayed().getName() + " is " + heuristic);
 				selectedNode.getChildArray().add(node);
 			} catch (Exception e) {
 				e.printStackTrace();
