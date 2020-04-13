@@ -1,0 +1,73 @@
+1,RandomPlayer,260714615,0,RandomPlayer,53,game00001.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:6_flip), PosOfUse: (4, 1)
+2,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00002.log,
+3,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00003.log,
+4,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00004.log,
+5,RandomPlayer,260714615,0,RandomPlayer,35,game00005.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:0), PosOfUse: (1, 6)
+6,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00006.log,
+7,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00007.log,
+8,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00008.log,
+9,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00009.log,
+10,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00010.log,
+11,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00011.log,
+12,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00012.log,
+13,RandomPlayer,260714615,0,RandomPlayer,53,game00013.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:8), PosOfUse: (3, 9)
+14,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00014.log,
+15,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00015.log,
+16,260714615,RandomPlayer,1,RandomPlayer,46,game00016.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:10), PosOfUse: (8, 7)
+17,RandomPlayer,260714615,0,RandomPlayer,53,game00017.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:8), PosOfUse: (9, 5)
+18,260714615,RandomPlayer,1,RandomPlayer,54,game00018.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:2), PosOfUse: (10, 6)
+19,RandomPlayer,260714615,0,RandomPlayer,7,game00019.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:14), PosOfUse: (7, 5)
+20,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00020.log,
+21,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00021.log,
+22,260714615,RandomPlayer,1,RandomPlayer,22,game00022.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:6_flip), PosOfUse: (3, 4)
+23,RandomPlayer,260714615,0,RandomPlayer,35,game00023.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:9_flip), PosOfUse: (7, 4)
+24,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00024.log,
+25,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00025.log,
+26,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00026.log,
+27,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00027.log,
+28,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00028.log,
+29,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00029.log,
+30,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00030.log,
+31,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00031.log,
+32,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00032.log,
+33,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00033.log,
+34,260714615,RandomPlayer,1,RandomPlayer,46,game00034.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:10), PosOfUse: (7, 1)
+35,RandomPlayer,260714615,0,RandomPlayer,45,game00035.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:6_flip), PosOfUse: (7, 8)
+36,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00036.log,
+37,RandomPlayer,260714615,0,RandomPlayer,19,game00037.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:0), PosOfUse: (1, 5)
+38,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00038.log,
+39,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00039.log,
+40,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00040.log,
+41,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00041.log,
+42,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00042.log,
+43,RandomPlayer,260714615,0,RandomPlayer,55,game00043.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:12_flip), PosOfUse: (4, 2)
+44,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00044.log,
+45,RandomPlayer,260714615,0,RandomPlayer,29,game00045.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:9_flip), PosOfUse: (5, 8)
+46,RandomPlayer,260714615,0,RandomPlayer,51,game00046.log,ILLEGAL MOVE: Player 1, CardUsed: (Tile:12_flip), PosOfUse: (6, 9)
+47,260714615,RandomPlayer,1,RandomPlayer,46,game00047.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:7), PosOfUse: (2, 2)
+48,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00048.log,
+49,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00049.log,
+50,RandomPlayer,260714615,GAMEOVER DRAW,NOBODY,56,game00050.log,
+51,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00051.log,
+52,RandomPlayer,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00052.log,
+53,260714615,RandomPlayer,1,RandomPlayer,22,game00053.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:10), PosOfUse: (6, 3)
+54,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00054.log,
+55,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00055.log,
+56,Human,260714615,GAMEOVER USER CANCEL UNDECIDED,NOBODY,2,game00056.log,USER CANCEL
+57,260714615,RandomPlayer,1,RandomPlayer,50,game00057.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:1), PosOfUse: (4, 5)
+58,260714615,RandomPlayer,1,RandomPlayer,50,game00058.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:10), PosOfUse: (8, 6)
+59,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00059.log,
+60,Human,Human,GAMEOVER USER CANCEL UNDECIDED,NOBODY,1,game00060.log,USER CANCEL
+61,260714615,RandomPlayer,1,RandomPlayer,30,game00061.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:0), PosOfUse: (10, 5)
+62,260714615,RandomPlayer,1,RandomPlayer,8,game00062.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:9_flip), PosOfUse: (4, 4)
+63,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00063.log,
+64,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00064.log,
+65,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00065.log,
+66,260714615,RandomPlayer,1,RandomPlayer,30,game00066.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:4_flip), PosOfUse: (1, 5)
+67,260714615,RandomPlayer,1,RandomPlayer,34,game00067.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:8), PosOfUse: (5, 3)
+68,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00068.log,
+69,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00069.log,
+70,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00070.log,
+71,260714615,RandomPlayer,1,RandomPlayer,2,game00071.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:5), PosOfUse: (5, 4)
+72,260714615,RandomPlayer,1,RandomPlayer,38,game00072.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:5), PosOfUse: (6, 3)
+73,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00073.log,

@@ -30,26 +30,21 @@ public class StudentPlayer extends SaboteurPlayer {
      * make decisions.
      */
     public Move chooseMove(SaboteurBoardState boardState) {
-    	long current = System.currentTimeMillis();
+    	
+    	if (MyTools.map.isEmpty()) MyTools.addPriorityTiles();
+    	
+    	long time_elapsed_initial = System.currentTimeMillis();
+    	long initial = System.currentTimeMillis();
     	
     	SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(boardState);
     	Tree tree = new Tree(clonedState);
     	Node rootNode = tree.getRoot();
     	
-    	
 //    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-//    	while (current - System.currentTimeMillis() < 2000) {
+    	while (System.currentTimeMillis() - initial < 2000) {
     				
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
-//    		
-//    		Node node1level4 = new Node(node2level3, null, 0,0,1);
-//    		
-//    		ArrayList<Node> children1Level4 = new ArrayList<Node>();
-//    		children1Level4.add(node1level4);
-//    		
-//    		node2level3.childArray = children1Level4;
-    		
     		
     		// Expansion
     		if (!selectedNode.state.gameOver()) {
@@ -67,17 +62,9 @@ public class StudentPlayer extends SaboteurPlayer {
     		
     		// Backpropagation
     		MyTools.MCTS_Backpropagation(simulation_node, playoutResult);
-    		
-//    		MyTools.MCTS_Backpropagation(node1level4, 1);
-    		
-//    		System.out.println(node1level4.visitCount + " " + node1level4.winScore);
-//    		System.out.println(node2level3.visitCount + " " + node2level3.winScore);
-//    		System.out.println(node2level2.visitCount + " " + node2level2.winScore);
-//    		System.out.println(node1level1.visitCount + " " + node1level1.winScore);
-//    		System.out.println(rootNode.visitCount + " " + rootNode.winScore);
-//    		
-//    	}
-//    	
+    	    		
+    	}
+
     	// Get child with maximum score
     	List<Node> root_children = rootNode.getChildArray();
     	Node picked_node = root_children.get(0);
@@ -90,8 +77,11 @@ public class StudentPlayer extends SaboteurPlayer {
     	tree.setRoot(picked_node);
     	
     	Move myMove = picked_node.getMovePlayed();
-    	
+    	if (!boardState.isLegal(picked_node.getMovePlayed()))
+    		myMove = boardState.getRandomMove();
         // Return your move to be processed by the server.
+    	long time_elapsed_final = System.currentTimeMillis();
+    	System.out.println("Time elapsed:" + (time_elapsed_final - time_elapsed_initial));
         return myMove;
 
     }

@@ -1,6 +1,10 @@
 package student_player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.PriorityQueue;
 import Saboteur.SaboteurMove;
 import Saboteur.cardClasses.SaboteurBonus;
 import Saboteur.cardClasses.SaboteurCard;
@@ -15,31 +19,65 @@ public class MyTools {
 	static boolean goldenNuggetFound = false;
 	static int[][] hiddenPos = {{12,3},{12,5},{12,7}};
 	static int[] goldenNuggetPosition = {};
+	static HashMap<SaboteurTile, Integer> map = new HashMap<SaboteurTile, Integer>();
+	
+	final int LOW_PRIORITY = 0;
+	final int MEDIUM_PRIORITY = 50;
+	final int HIGH_PRIORITY = 100;
 	
 	// We already know all the moves passed in this function are legal
 	public static double evaluateGreedyMove(SaboteurBoardStateClone boardState, SaboteurMove move) {
 
 		SaboteurCard cardPlayed = move.getCardPlayed();
 		
-		if (cardPlayed instanceof SaboteurBonus) return 0;
-		
+		/**
+		 * For Bonus, if it is a legal move, then we are malused and we should play it anyway
+		 * It is more important than a map
+		 */
+		if (cardPlayed instanceof SaboteurBonus)
+			return 1000;
+
+		/**
+		 * For Map, it would matter way more to play it when the nugget is not revealed yet, 
+		 * and would not have any use otherwise
+		 */
 		else if (cardPlayed instanceof SaboteurMap) {
-			if (goldenNuggetFound) return 0;
-			else return 0; // No use playing Map if already know the position of nugget
+			if (goldenNuggetFound) return -100; // No use playing Map if already know the position of nugget
+			else return 100; 
 		}
-		
-		else if (cardPlayed instanceof SaboteurMalus) return 0;
-		
-		else if (cardPlayed instanceof SaboteurDestroy) return 0;
-		
+
+		/**
+		 * For Malus, it is a sounder idea to play it towards the end, because at the beginning we 
+		 * are both working towards reaching the hidden tiles, but at the end we want to prevent the 
+		 * opponent from doing so. Plus, it is more likely that the agent would have dropped Bonuses 
+		 * throughout the game because they are not as high of a priority, so it may be scarce of it by the end.
+
+		 */
+		else if (cardPlayed instanceof SaboteurMalus) {
+			if (boardState.getTurnNumber() < 25) return 0;
+			else return 100;
+		}
+		/**
+		 * For Destroy, it matters more which card are we destroying, so we set a heuristic score 
+		 * according to that. However, it also matters not to sabotage ourselves, and the path the 
+		 * we are building. We can compute the most likely path since we know our cards and the cards 
+		 * that can be played from the opponent and those that can be drawn. 
+		 */
+//		else if (cardPlayed instanceof SaboteurDestroy) {
+//
+//		}
+
 		else if (cardPlayed instanceof SaboteurTile) {
 			if (goldenNuggetFound) {
 				double distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - goldenNuggetPosition[0], 2) + Math.pow(move.getPosPlayed()[1] - goldenNuggetPosition[1], 2));
 				return 0;
 			}
-			else return 0;
+			else {
+				String idx = ((SaboteurTile) cardPlayed).getIdx();
+				return map.get(idx);
+			}
 		}
-		
+
 		return 0;
 	}
 
@@ -99,9 +137,9 @@ public class MyTools {
 				clonedState = new SaboteurBoardStateClone(selectedNode.getState());
 				SaboteurBoardStateClone newClonedState = clonedState.processMove(move);
 				// TODO: For now, all heuristics are 0
-				//double heuristic = MyTools.evaluateGreedyMove(clonedState, move);
-				Node node = new Node(newClonedState, selectedNode, move);
-//				Node node = new Node(newClonedState, selectedNode, move, heuristic);
+				double heuristic = MyTools.evaluateGreedyMove(clonedState, move);
+				//				Node node = new Node(newClonedState, selectedNode, move);
+				Node node = new Node(newClonedState, selectedNode, move, heuristic);
 				selectedNode.getChildArray().add(node);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -119,7 +157,11 @@ public class MyTools {
 			if(legal_moves.size()>0) {
 				int random_index = (int) (Math.random() * legal_moves.size());
 				if(clonedState.isLegal(legal_moves.get(random_index))) {
-					clonedState = clonedState.processMove(legal_moves.get(random_index));
+					try {
+						clonedState = clonedState.processMove(legal_moves.get(random_index));		
+					} catch (Exception e) {
+						System.out.println("NIMIT IS HIGH");
+					}
 				}
 				else {
 					clonedState = clonedState.processMove(clonedState.getRandomMove());
@@ -166,5 +208,21 @@ public class MyTools {
 				}
 			}
 		}
+	}
+	
+public static void addPriorityTiles() {
+		
+		SaboteurTile[] firstPriority = {new SaboteurTile("0"), new SaboteurTile("5"),new SaboteurTile("6"),
+				new SaboteurTile("8"),new SaboteurTile("9"),new SaboteurTile("10"), new SaboteurTile("6_flip"),
+				new SaboteurTile("7_flip")};
+		SaboteurTile[] secondPriority = {new SaboteurTile("5_flip"), new SaboteurTile("7"), new SaboteurTile("9_flip")};
+		SaboteurTile[] thirdPriority = {new SaboteurTile("1"), new SaboteurTile("2"), new SaboteurTile("2_flip"), 
+				new SaboteurTile("3"), new SaboteurTile("3_flip"), new SaboteurTile("4"), new SaboteurTile("4_flip"),
+				new SaboteurTile("11"),new SaboteurTile("11_flip"), new SaboteurTile("12"), new SaboteurTile("12_flip"),
+				new SaboteurTile("13"), new SaboteurTile("14"), new SaboteurTile("14_flip"),new SaboteurTile("15")};
+		
+		for(SaboteurTile tile: firstPriority) map.put(tile, 100);
+		for(SaboteurTile tile: secondPriority) map.put(tile, 50);
+		for(SaboteurTile tile: thirdPriority) map.put(tile, 0);		
 	}
 }
