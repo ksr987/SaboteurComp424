@@ -43,12 +43,25 @@ public class SaboteurBoardStateClone extends BoardState {
 
 	public SaboteurBoardStateClone(SaboteurBoardState pbs) {
 
+		// initialize board
 		this.board = new SaboteurTile[BOARD_SIZE][BOARD_SIZE];
 		for (int i = 0; i < BOARD_SIZE; i++) {
 			SaboteurTile[][] display = pbs.getHiddenBoard();
 			System.arraycopy(display[i], 0, this.board[i], 0, BOARD_SIZE);
 		}
 
+		// initialize int board
+		this.intBoard = new int[BOARD_SIZE*3][BOARD_SIZE*3];
+		for (int i = 0; i < BOARD_SIZE*3; i++) {
+			for (int j = 0; j < BOARD_SIZE*3; j++) {
+				this.intBoard[i][j] = EMPTY;
+			}
+		}
+		
+		// initialize deck
+		this.Deck = SaboteurCard.getDeck();
+		
+		// initialize player cards
 		if(pbs.getTurnPlayer() == 1) {
 			this.player1Cards = pbs.getCurrentPlayerCards();
 
@@ -74,37 +87,29 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 
-		this.Deck = SaboteurCard.getDeck();
-
+		// initialize hidden cards
 		for(int i = 0; i < hiddenCards.length; i++) {
 			this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
 		}
 		
-		SaboteurTile[][] display = pbs.getBoardForDisplay();
+		// TODO: something about this is wrong i.e. index, 8, hidden1, etc. ?
 		for(int i = 0; i < hiddenCards.length; i++) {
-			this.hiddenCards[i] = display[hiddenPos[i][0]][hiddenPos[i][1]];
 			if (hiddenCards[i].getIdx()=="8") {
-				if (pbs.getTurnPlayer()==1) player1hiddenRevealed[i] = true;
-				else player2hiddenRevealed[i] = true;
 				hiddenRevealed[i] = true;
+				if (pbs.getTurnPlayer()==1) {
+					player1hiddenRevealed[i] = true;
+				}
+				else {
+					player2hiddenRevealed[i] = true;
+				}
 			}
 		}
 
+		// TODO: check this too
 		for(int i = 0; i < hiddenCards.length; i++) {
 			if(this.hiddenCards[i].getIdx().equals("nugget")) this.nuggetFound = true;
 			else this.nuggetFound = false;
 		}
-
-		// TODO: Check if three lines below equivalent to above
-		//		System.arraycopy(pbs.player1hiddenRevealed,0,this.player1hiddenRevealed,0,pbs.player1hiddenRevealed.length);
-		//		System.arraycopy(pbs.player2hiddenRevealed,0,this.player2hiddenRevealed,0,pbs.player2hiddenRevealed.length);
-		//		System.arraycopy(pbs.hiddenRevealed,0,this.hiddenRevealed,0,pbs.hiddenRevealed.length);
-
-		// TODO: Same here
-		//		this.hiddenCards = new SaboteurTile[pbs.hiddenCards.length];
-		//		for(int i=0;i<pbs.hiddenCards.length;i++){
-		//			this.hiddenCards[i] = new SaboteurTile(pbs.hiddenCards[i].getName().split(":")[1]); //Note: we might encounter a problem here, and should define card as cloneable
-		//		}
 
 		this.player1nbMalus = pbs.getNbMalus(1);
 		this.player2nbMalus = pbs.getNbMalus(2);
@@ -113,7 +118,7 @@ public class SaboteurBoardStateClone extends BoardState {
 		this.turnNumber = pbs.getTurnNumber();	
 		this.rand = new Random(1998);
 	}
-	
+
 	public int[] getNuggetPosition() {
 		int[] position = new int[2];
 		for(int i = 0; i < hiddenCards.length; i++) {
@@ -124,19 +129,32 @@ public class SaboteurBoardStateClone extends BoardState {
 		}
 		return position;
 	}
-	
+
 	public boolean isNuggetFound() {
 		return this.nuggetFound;
 	}
 
 	public SaboteurBoardStateClone(SaboteurBoardStateClone pbs) {
 
+		// initialize board
 		this.board = new SaboteurTile[BOARD_SIZE][BOARD_SIZE];
 		for (int i = 0; i < BOARD_SIZE; i++) {
 			SaboteurTile[][] display = pbs.getHiddenBoard();
 			System.arraycopy(display[i], 0, this.board[i], 0, BOARD_SIZE);
 		}
 
+		// initialize int board
+		this.intBoard = new int[BOARD_SIZE*3][BOARD_SIZE*3];
+		for (int i = 0; i < BOARD_SIZE*3; i++) {
+			for (int j = 0; j < BOARD_SIZE*3; j++) {
+				this.intBoard[i][j] = EMPTY;
+			}
+		}
+		
+		// initialize deck
+		this.Deck = SaboteurCard.getDeck();
+		
+		// initialize player cards
 		if(pbs.getTurnPlayer() == 1) {
 			this.player1Cards = pbs.getCurrentPlayerCards();
 
@@ -162,37 +180,29 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 
-		this.Deck = SaboteurCard.getDeck();
-
+		// initialize hidden cards
 		for(int i = 0; i < hiddenCards.length; i++) {
 			this.hiddenCards[i] = this.board[hiddenPos[i][0]][hiddenPos[i][1]];
 		}
 		
-		SaboteurTile[][] display = pbs.getBoardForDisplay();
+		// TODO: something about this is wrong i.e. index, 8, hidden1, etc. ?
 		for(int i = 0; i < hiddenCards.length; i++) {
-			this.hiddenCards[i] = display[hiddenPos[i][0]][hiddenPos[i][1]];
 			if (hiddenCards[i].getIdx()=="8") {
-				if (pbs.getTurnPlayer()==1) player1hiddenRevealed[i] = true;
-				else player2hiddenRevealed[i] = true;
 				hiddenRevealed[i] = true;
+				if (pbs.getTurnPlayer()==1) {
+					player1hiddenRevealed[i] = true;
+				}
+				else {
+					player2hiddenRevealed[i] = true;
+				}
 			}
 		}
 
+		// TODO: check this too
 		for(int i = 0; i < hiddenCards.length; i++) {
 			if(this.hiddenCards[i].getIdx().equals("nugget")) this.nuggetFound = true;
 			else this.nuggetFound = false;
 		}
-
-		// TODO: Check if three lines below equivalent to above
-		//		System.arraycopy(pbs.player1hiddenRevealed,0,this.player1hiddenRevealed,0,pbs.player1hiddenRevealed.length);
-		//		System.arraycopy(pbs.player2hiddenRevealed,0,this.player2hiddenRevealed,0,pbs.player2hiddenRevealed.length);
-		//		System.arraycopy(pbs.hiddenRevealed,0,this.hiddenRevealed,0,pbs.hiddenRevealed.length);
-
-		// TODO: Same here
-		//		this.hiddenCards = new SaboteurTile[pbs.hiddenCards.length];
-		//		for(int i=0;i<pbs.hiddenCards.length;i++){
-		//			this.hiddenCards[i] = new SaboteurTile(pbs.hiddenCards[i].getName().split(":")[1]); //Note: we might encounter a problem here, and should define card as cloneable
-		//		}
 
 		this.player1nbMalus = pbs.getNbMalus(1);
 		this.player2nbMalus = pbs.getNbMalus(2);
