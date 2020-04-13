@@ -12,6 +12,7 @@ public class Node {
     SaboteurMove movePlayed;
     int visitCount;
     double winScore;
+    double heuristic;
     
 //    public Node(Node parent, List<Node> childArray, int winScore, int visitCount, int turn) {
 //    	
@@ -47,6 +48,16 @@ public class Node {
         this.visitCount = 0;
         this.winScore = 0;
         this.movePlayed = move;
+    }
+    
+    public Node(SaboteurBoardStateClone state, Node parent, SaboteurMove move, double heuristic) {
+        this.state = state;
+        this.parent = parent;
+        this.childArray = new ArrayList<>();
+        this.visitCount = 0;
+        this.winScore = 0;
+        this.movePlayed = move;
+        this.heuristic = heuristic;
     }
     
     public Node(SaboteurBoardStateClone state, Node parent, List<Node> childArray) {

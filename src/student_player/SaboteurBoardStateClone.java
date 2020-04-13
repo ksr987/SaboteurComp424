@@ -841,7 +841,7 @@ public class SaboteurBoardStateClone extends BoardState {
 			visited.add(visitingPos);
 			if(usingCard) addUnvisitedNeighborToQueue(visitingPos,queue,visited,BOARD_SIZE,usingCard);
 			else addUnvisitedNeighborToQueue(visitingPos,queue,visited,BOARD_SIZE*3,usingCard);
-			System.out.println(queue.size());
+//			System.out.println(queue.size());
 		}
 		return false;
 	}
@@ -891,7 +891,7 @@ public class SaboteurBoardStateClone extends BoardState {
 
 				if (cardPath(originTargets, targetPos, true)) { //checks that there is a cardPath
 					//System.out.println("card path found"); //todo remove
-					this.printBoard();
+					//this.printBoard();
 					//next: checks that there is a path of ones.
 					ArrayList<int[]> originTargets2 = new ArrayList<>();
 					//the starting points

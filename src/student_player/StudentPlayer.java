@@ -21,7 +21,7 @@ public class StudentPlayer extends SaboteurPlayer {
      * associate you with your agent. The constructor should do nothing else.
      */
     public StudentPlayer() {
-        super(KETAN_SID);
+        super(ALAIN_SID);
     }
 
     /**
@@ -38,51 +38,8 @@ public class StudentPlayer extends SaboteurPlayer {
     	
     	
 //    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-//    	while (current - System.currentTimeMillis() < 30000) {
-    		
-//    		Node rootNode = new Node(null, null, 11,21,1);
-//    		Node node1level1 = new Node(rootNode, null, 7,10,0);
-//    		Node node2level1 = new Node(rootNode, null, 0,3,0);
-//    		Node node3level1 = new Node(rootNode, null, 3,8,0);
-//    		
-//    		ArrayList<Node> children1Level1 = new ArrayList<Node>();
-//    		children1Level1.add(node1level1);
-//    		children1Level1.add(node2level1);
-//    		children1Level1.add(node3level1);
-//    		
-//    		rootNode.childArray = children1Level1;
-//    		
-//    		Tree tree = new Tree(rootNode);
-//    		
-//    		Node node1level2 = new Node(node1level1, null, 2,4,1);
-//    		Node node2level2 = new Node(node1level1, null, 1,6,1);
-//    		
-//    		ArrayList<Node> children1Level2 = new ArrayList<Node>();
-//    		children1Level2.add(node1level2);
-//    		children1Level2.add(node2level2);
-//    		
-//    		node1level1.childArray = children1Level2;
-//    		
-//    		Node node3level2 = new Node(node3level1, null, 1,2,1);
-//    		Node node4level2 = new Node(node3level1, null, 2,3,1);
-//    		Node node5level2 = new Node(node3level1, null, 2,3,1);
-//    		
-//    		ArrayList<Node> children2Level2 = new ArrayList<Node>();
-//    		children2Level2.add(node3level2);
-//    		children2Level2.add(node4level2);
-//    		children2Level2.add(node5level2);
-//    		
-//    		node3level1.childArray = children2Level2;
-//    		
-//    		Node node1level3 = new Node(node2level2, null, 2,3,0);
-//    		Node node2level3 = new Node(node2level2, null, 3,3,0);
-//    		
-//    		ArrayList<Node> children1Level3 = new ArrayList<Node>();
-//    		children1Level3.add(node1level3);
-//    		children1Level3.add(node2level3);
-//    		
-//    		node2level2.childArray = children1Level3;
-//    		
+//    	while (current - System.currentTimeMillis() < 2000) {
+    				
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
 //    		
@@ -136,5 +93,6 @@ public class StudentPlayer extends SaboteurPlayer {
     	
         // Return your move to be processed by the server.
         return myMove;
+
     }
 }
