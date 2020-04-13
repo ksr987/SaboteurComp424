@@ -16,34 +16,31 @@ import Saboteur.cardClasses.SaboteurTile;
 
 public class MyTools {
 
-	static boolean goldenNuggetFound = false;
-	static int[][] hiddenPos = {{12,3},{12,5},{12,7}};
-	static int[] goldenNuggetPosition = {};
 	static HashMap<String, Integer> map = new HashMap<String, Integer>();
-	
+	static int[][] hiddenPos = {{12,3},{12,5},{12,7}};
 	final double LOW_PRIORITY = 0.0;
 	final double MEDIUM_PRIORITY = 50.0;
 	final double HIGH_PRIORITY = 100.0;
-	
+
 	// We already know all the moves passed in this function are legal
 	public static double evaluateGreedyMove(SaboteurBoardStateClone boardState, SaboteurMove move) {
 
 		SaboteurCard cardPlayed = move.getCardPlayed();
-		
+
 		/**
 		 * For Bonus, if it is a legal move, then we are malused and we should play it anyway
 		 * It is more important than a map
 		 */
 		if (cardPlayed instanceof SaboteurBonus)
-			return 1000;
+			return 100000;
 
 		/**
 		 * For Map, it would matter way more to play it when the nugget is not revealed yet, 
 		 * and would not have any use otherwise
 		 */
 		else if (cardPlayed instanceof SaboteurMap) {
-			if (goldenNuggetFound) return -100; // No use playing Map if already know the position of nugget
-			else return 100; 
+			if (boardState.isNuggetFound()) return -100; // No use playing Map if already know the position of nugget
+			else return 10000; 
 		}
 
 		/**
@@ -63,14 +60,18 @@ public class MyTools {
 		 * we are building. We can compute the most likely path since we know our cards and the cards 
 		 * that can be played from the opponent and those that can be drawn. 
 		 */
-//		else if (cardPlayed instanceof SaboteurDestroy) {
-//
-//		}
+		//		else if (cardPlayed instanceof SaboteurDestroy) {
+		//
+		//		}
 
 		else if (cardPlayed instanceof SaboteurTile) {
 			double distance;
-			if (goldenNuggetFound)
+			if (boardState.isNuggetFound()) {
+				int[] goldenNuggetPosition = boardState.getNuggetPosition();
+				System.out.print("GOLDEN NUGGET FOUND");
 				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - goldenNuggetPosition[0], 2) + Math.pow(move.getPosPlayed()[1] - goldenNuggetPosition[1], 2));
+			}
+
 			else {
 				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - hiddenPos[1][0], 2) + Math.pow(move.getPosPlayed()[1] - hiddenPos[1][1], 2));
 			}
@@ -114,7 +115,7 @@ public class MyTools {
 
 				double uct = (double) (wins) / (double) (total_simulations_child)
 						+ Math.sqrt(2 * Math.log(total_simulations_parent) / (double) total_simulations_child)
-						+ (node.heuristic / (double) (total_simulations_child));
+						+ node.heuristic / (double) (total_simulations_child);
 
 				if (uct > max_uct) {
 					max_uct = uct;
@@ -129,7 +130,6 @@ public class MyTools {
 	public static void MCTS_Expansion(Node selectedNode) {
 		SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(selectedNode.getState());
 		ArrayList<SaboteurMove> legal_moves = clonedState.getAllLegalMoves();
-		if (! goldenNuggetFound) goldenNuggetFound(clonedState);
 
 		//System.out.println("Legal Moves size: " + legal_moves.size());
 		for (SaboteurMove move : legal_moves) {
@@ -193,29 +193,13 @@ public class MyTools {
 		}
 	}
 
-	public static void goldenNuggetFound(SaboteurBoardStateClone boardState) {
-		SaboteurTile[][] boardForDisplay = boardState.getBoardForDisplay();
+	public static void addPriorityTiles() {
 
-		for (int[] position : hiddenPos) {
-			SaboteurTile hiddenTile = boardForDisplay[position[0]][position[1]];
-			if (hiddenTile != null ) {
-				// TODO: Make sure it's indeed "nugget"
-				if (hiddenTile.getName() == "nugget") {
-					goldenNuggetFound = true;
-					goldenNuggetPosition[0] = position[0];
-					goldenNuggetPosition[1] = position[1];	
-				}
-			}
-		}
-	}
-	
-public static void addPriorityTiles() {
-		
 		String[] firstPriority = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
 		String[] secondPriority = {"5_flip", "7", "9_flip", "1", "2", "2_flip"};
 		String[] thirdPriority = {"1", "2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "13", "14", "14_flip", "15"};
 
-		
+
 		for(String tile: firstPriority) map.put(tile, 100);
 		for(String tile: secondPriority) map.put(tile, 50);
 		for(String tile: thirdPriority) map.put(tile, 0);		

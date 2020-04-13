@@ -13,8 +13,9 @@ public class StudentPlayer extends SaboteurPlayer {
 
 	private static final String KETAN_SID = "260732873";
 	private static final String ALAIN_SID = "260714615";
-	private static final int timeout = 20;
+	private static final int timeout = 2;
 	public static int player_id;
+	
     /**
      * You must modify this constructor to return your student number. This is
      * important, because this is what the code that runs the competition uses to
@@ -23,7 +24,7 @@ public class StudentPlayer extends SaboteurPlayer {
     public StudentPlayer() {
         super(ALAIN_SID);
     }
-
+    					
     /**
      * This is the primary method that you need to implement. The ``boardState``
      * object contains the current state of the game, which your agent must use to
@@ -40,7 +41,7 @@ public class StudentPlayer extends SaboteurPlayer {
     	Node rootNode = tree.getRoot();
     	
 //    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-    	while (System.currentTimeMillis() - initial < (timeout * 900)) {
+    	while (System.currentTimeMillis() - initial < (timeout * 950)) {
     				
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
@@ -81,6 +82,5 @@ public class StudentPlayer extends SaboteurPlayer {
     		myMove = boardState.getRandomMove();
     	}
         return myMove;
-
     }
 }
