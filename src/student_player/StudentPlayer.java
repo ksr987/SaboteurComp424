@@ -13,7 +13,7 @@ public class StudentPlayer extends SaboteurPlayer {
 
 	private static final String KETAN_SID = "260732873";
 	private static final String ALAIN_SID = "260714615";
-	private static final int timeout = 1;
+	private static final int timeout = 2;
 	public static int player_id;
 	
     /**
@@ -41,7 +41,7 @@ public class StudentPlayer extends SaboteurPlayer {
     	Node rootNode = tree.getRoot();
     	
 //    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-    	while (System.currentTimeMillis() - initial < (timeout * 900)) {
+    	while (System.currentTimeMillis() - initial < (timeout * 999)) {
     				
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
@@ -90,6 +90,7 @@ public class StudentPlayer extends SaboteurPlayer {
     		System.out.println("Move is illegal");
     		myMove = boardState.getRandomMove();
     	}
+    	System.out.println("Time Elapsed: " + (System.currentTimeMillis() - initial));
         return myMove;
     }
 }

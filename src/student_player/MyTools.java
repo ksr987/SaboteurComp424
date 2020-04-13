@@ -148,7 +148,7 @@ public class MyTools {
 		Node parentNode = rootNode;
 		// while we still haven't reached a leaf...
 		while(!parentNode.getChildArray().isEmpty()) {
-//			boolean shouldExitLoop = true;
+			boolean shouldExitLoop = true;
 			double max_uct = 0;
 			Node currentNode = parentNode;
 
@@ -165,13 +165,13 @@ public class MyTools {
 				if (uct > max_uct) {
 					max_uct = uct;
 					currentNode = node;
-//					shouldExitLoop = false;
+					shouldExitLoop = false;
 				}
 			}
 			parentNode = currentNode;
-//			if (shouldExitLoop == true) {
-//				return parentNode;
-//			}
+			if (shouldExitLoop == true) {
+				return parentNode;
+			}
 		}
 		return parentNode;
 	}
