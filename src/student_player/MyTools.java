@@ -19,11 +19,11 @@ public class MyTools {
 	static boolean goldenNuggetFound = false;
 	static int[][] hiddenPos = {{12,3},{12,5},{12,7}};
 	static int[] goldenNuggetPosition = {};
-	static HashMap<SaboteurTile, Integer> map = new HashMap<SaboteurTile, Integer>();
+	static HashMap<String, Integer> map = new HashMap<String, Integer>();
 	
-	final int LOW_PRIORITY = 0;
-	final int MEDIUM_PRIORITY = 50;
-	final int HIGH_PRIORITY = 100;
+	final double LOW_PRIORITY = 0.0;
+	final double MEDIUM_PRIORITY = 50.0;
+	final double HIGH_PRIORITY = 100.0;
 	
 	// We already know all the moves passed in this function are legal
 	public static double evaluateGreedyMove(SaboteurBoardStateClone boardState, SaboteurMove move) {
@@ -68,16 +68,16 @@ public class MyTools {
 //		}
 
 		else if (cardPlayed instanceof SaboteurTile) {
-			if (goldenNuggetFound) {
-				double distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - goldenNuggetPosition[0], 2) + Math.pow(move.getPosPlayed()[1] - goldenNuggetPosition[1], 2));
-				return 0;
-			}
+			double distance;
+			if (goldenNuggetFound)
+				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - goldenNuggetPosition[0], 2) + Math.pow(move.getPosPlayed()[1] - goldenNuggetPosition[1], 2));
 			else {
-				String idx = ((SaboteurTile) cardPlayed).getIdx();
-				return map.get(idx);
+				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - hiddenPos[1][0], 2) + Math.pow(move.getPosPlayed()[1] - hiddenPos[1][1], 2));
 			}
+			String idx = ((SaboteurTile) cardPlayed).getIdx();
+			int priority = map.get(idx);
+			return priority / distance;
 		}
-
 		return 0;
 	}
 
@@ -129,17 +129,16 @@ public class MyTools {
 	public static void MCTS_Expansion(Node selectedNode) {
 		SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(selectedNode.getState());
 		ArrayList<SaboteurMove> legal_moves = clonedState.getAllLegalMoves();
-		//if (! goldenNuggetFound) goldenNuggetFound(clonedState);
+		if (! goldenNuggetFound) goldenNuggetFound(clonedState);
 
 		//System.out.println("Legal Moves size: " + legal_moves.size());
 		for (SaboteurMove move : legal_moves) {
 			try {
 				clonedState = new SaboteurBoardStateClone(selectedNode.getState());
 				SaboteurBoardStateClone newClonedState = clonedState.processMove(move);
-				// TODO: For now, all heuristics are 0
 				double heuristic = MyTools.evaluateGreedyMove(clonedState, move);
-				//				Node node = new Node(newClonedState, selectedNode, move);
 				Node node = new Node(newClonedState, selectedNode, move, heuristic);
+				System.out.println("Heuristic for " + move.getCardPlayed().getName() + " is " + heuristic);
 				selectedNode.getChildArray().add(node);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -212,17 +211,13 @@ public class MyTools {
 	
 public static void addPriorityTiles() {
 		
-		SaboteurTile[] firstPriority = {new SaboteurTile("0"), new SaboteurTile("5"),new SaboteurTile("6"),
-				new SaboteurTile("8"),new SaboteurTile("9"),new SaboteurTile("10"), new SaboteurTile("6_flip"),
-				new SaboteurTile("7_flip")};
-		SaboteurTile[] secondPriority = {new SaboteurTile("5_flip"), new SaboteurTile("7"), new SaboteurTile("9_flip")};
-		SaboteurTile[] thirdPriority = {new SaboteurTile("1"), new SaboteurTile("2"), new SaboteurTile("2_flip"), 
-				new SaboteurTile("3"), new SaboteurTile("3_flip"), new SaboteurTile("4"), new SaboteurTile("4_flip"),
-				new SaboteurTile("11"),new SaboteurTile("11_flip"), new SaboteurTile("12"), new SaboteurTile("12_flip"),
-				new SaboteurTile("13"), new SaboteurTile("14"), new SaboteurTile("14_flip"),new SaboteurTile("15")};
+		String[] firstPriority = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
+		String[] secondPriority = {"5_flip", "7", "9_flip", "1", "2", "2_flip"};
+		String[] thirdPriority = {"1", "2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "13", "14", "14_flip", "15"};
+
 		
-		for(SaboteurTile tile: firstPriority) map.put(tile, 100);
-		for(SaboteurTile tile: secondPriority) map.put(tile, 50);
-		for(SaboteurTile tile: thirdPriority) map.put(tile, 0);		
+		for(String tile: firstPriority) map.put(tile, 100);
+		for(String tile: secondPriority) map.put(tile, 50);
+		for(String tile: thirdPriority) map.put(tile, 0);		
 	}
 }

@@ -13,7 +13,7 @@ public class StudentPlayer extends SaboteurPlayer {
 
 	private static final String KETAN_SID = "260732873";
 	private static final String ALAIN_SID = "260714615";
-	
+	private static final int timeout = 20;
 	public static int player_id;
     /**
      * You must modify this constructor to return your student number. This is
@@ -33,7 +33,6 @@ public class StudentPlayer extends SaboteurPlayer {
     	
     	if (MyTools.map.isEmpty()) MyTools.addPriorityTiles();
     	
-    	long time_elapsed_initial = System.currentTimeMillis();
     	long initial = System.currentTimeMillis();
     	
     	SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(boardState);
@@ -41,7 +40,7 @@ public class StudentPlayer extends SaboteurPlayer {
     	Node rootNode = tree.getRoot();
     	
 //    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-    	while (System.currentTimeMillis() - initial < 2000) {
+    	while (System.currentTimeMillis() - initial < (timeout * 900)) {
     				
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
@@ -77,11 +76,10 @@ public class StudentPlayer extends SaboteurPlayer {
     	tree.setRoot(picked_node);
     	
     	Move myMove = picked_node.getMovePlayed();
-    	if (!boardState.isLegal(picked_node.getMovePlayed()))
+    	if (!boardState.isLegal(picked_node.getMovePlayed())) {
+    		System.out.println("Move is illegal");
     		myMove = boardState.getRandomMove();
-        // Return your move to be processed by the server.
-    	long time_elapsed_final = System.currentTimeMillis();
-    	System.out.println("Time elapsed:" + (time_elapsed_final - time_elapsed_initial));
+    	}
         return myMove;
 
     }

@@ -71,3 +71,5 @@
 71,260714615,RandomPlayer,1,RandomPlayer,2,game00071.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:5), PosOfUse: (5, 4)
 72,260714615,RandomPlayer,1,RandomPlayer,38,game00072.log,ILLEGAL MOVE: Player 0, CardUsed: (Tile:5), PosOfUse: (6, 3)
 73,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00073.log,
+74,260714615,RandomPlayer,GAMEOVER DRAW,NOBODY,56,game00074.log,
+75,260714615,RandomPlayer,1,RandomPlayer,38,game00075.log,TIMEOUT
