@@ -17,12 +17,17 @@ import Saboteur.cardClasses.SaboteurTile;
 public class MyTools {
 
 	static HashMap<String, Integer> map = new HashMap<String, Integer>();
+	
+	/*
+	 * hiddenPos: position of hidden objectives in the board
+	 * LOW_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY: Priorities set for different types of tiles  
+	 */
 	static int[][] hiddenPos = {{12,3},{12,5},{12,7}};
 	final double LOW_PRIORITY = 0.0;
 	final double MEDIUM_PRIORITY = 50.0;
 	final double HIGH_PRIORITY = 100.0;
 
-	// We already know all the moves passed in this function are legal
+	//Evaluation function that returns the heuristic of a legal move based on the board state
 	public static double evaluateGreedyMove(SaboteurBoardStateClone boardState, SaboteurMove move) {
 
 		SaboteurCard cardPlayed = move.getCardPlayed();
@@ -61,7 +66,8 @@ public class MyTools {
 		 * that can be played from the opponent and those that can be drawn. 
 		 */
 		
-		// TODO: Destroy the cards that are playing outwards, giving more priority to the tiles closer to hidden objective
+		//Destroy the cards that are playing outwards (away from the path from entrance to hidden objective 
+		//giving more priority to the tiles closer to hidden objective
 		else if (cardPlayed instanceof SaboteurDestroy) {
 			
 			int xpos = move.getPosPlayed()[0];
@@ -75,11 +81,15 @@ public class MyTools {
 			
 		}
 
+		/**
+		 * For each tile, depending on if the golden nugget has been revealed, we set the heuristic as the 
+		 * hypotenuse distance from the position of the tile to the golden nugget if it has been revealed
+		 * otherwise, we calculate the hypotenuse distance to the middle hidden objective
+		 */
 		else if (cardPlayed instanceof SaboteurTile) {
 			double distance;
 			if (boardState.isNuggetFound()) {
 				int[] goldenNuggetPosition = boardState.getNuggetPosition();
-//				System.out.print("GOLDEN NUGGET FOUND");
 				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - goldenNuggetPosition[0], 2) + Math.pow(move.getPosPlayed()[1] - goldenNuggetPosition[1], 2));
 			}
 
@@ -95,9 +105,7 @@ public class MyTools {
 		return 0;
 	}
 
-	// TODO: This method identifies whether the card played is going inwards i.e. towards 
-	// the hidden objectives. At least one of its extremes should be inside of the "square" formed by the entrace and hidden tiles
-	// i.e. 
+	//checks if the tile played is towards the hidden objectives, or away from it based on the tile path and the position of the move
 	private static boolean playedInwards(SaboteurMove move, SaboteurBoardStateClone boardState) {
 		
 		//this method only valid for SaboteurTile instance
@@ -144,14 +152,16 @@ public class MyTools {
 		return minMove;
 	}
 
+	/**
+	 * method that selects the leaf node in a tree starting from root node, based on the Upper Confidence Tree calculation 
+	 * @param rootNode
+	 * @return leaf node
+	 */
 	public static Node MCTS_Selection(Node rootNode) {
 		Node parentNode = rootNode;
-//		int i =0;
 
 		// while we still haven't reached a leaf...
 		while(parentNode.getChildArray().size()>0) {
-//			boolean shouldExitLoop = true;
-//			i++;
 			double max_uct = 0;
 			Node currentNode = parentNode;
 
@@ -169,39 +179,41 @@ public class MyTools {
 				if (uct > max_uct) {
 					max_uct = uct;
 					currentNode = node;
-//					shouldExitLoop = false;
 				}
 			}
 			parentNode = currentNode;
-//			if(shouldExitLoop==true) {
-//				return parentNode;
-//			}
 		}
 		return parentNode;
 	}
 
+	/**
+	 * Expand all the possible legal moves by creating new node for each legal move
+	 * @param selectedNode
+	 */
 	public static void MCTS_Expansion(Node selectedNode) {
 		SaboteurBoardStateClone clonedState = new SaboteurBoardStateClone(selectedNode.getState());
 		ArrayList<SaboteurMove> legal_moves = clonedState.getAllLegalMoves();
 
-		//System.out.println("Legal Moves size: " + legal_moves.size());
 		for (SaboteurMove move : legal_moves) {
 			try {
 				clonedState = new SaboteurBoardStateClone(selectedNode.getState());
 				SaboteurBoardStateClone newClonedState = clonedState.processMove(move);
 				double heuristic = MyTools.evaluateGreedyMove(clonedState, move);
 				Node node = new Node(newClonedState, selectedNode, move, heuristic);
-//				System.out.println("Heuristic for " + move.getCardPlayed().getName() + " is " + heuristic);
 				// Here, we should be adding nodes in descending order of their heuristic so that in simulation
 				// we pick the one
 				selectedNode.getChildArray().add(node);
 			} catch (Exception e) {
 				e.printStackTrace();
-				//System.out.println(Arrays.deepToString(clonedState.getHiddenBoard()).replace("], ", "]\n"));
 			}
 		}
 	}
-
+	
+	/**
+	 * Simulate the game play by taking the leaf node, and running the subsequent moves randomly
+	 * @param currentNode
+	 * @return the result of the playout
+	 */
 	public static double MCTS_Simulation(Node currentNode) {
 		Node clonedNode = currentNode;
 		SaboteurBoardStateClone clonedState = clonedNode.getState();
@@ -214,7 +226,7 @@ public class MyTools {
 					try {
 						clonedState = clonedState.processMove(legal_moves.get(random_index));		
 					} catch (Exception e) {
-						System.out.println("NIMIT IS HIGH");
+						e.printStackTrace();
 					}
 				}
 				else {
@@ -226,9 +238,14 @@ public class MyTools {
 		int winner = clonedState.getWinner();
 		if (winner == currentNode.getState().getTurnPlayer()) return 1;	// our player won
 		else if (winner == Integer.MAX_VALUE) return 0.5;	// it's a draw
-		else return 0;
+		else return 0; //our player lost
 	}
 
+	/**
+	 * Backpropagate the result of the playout to all the nodes until we reach root node
+	 * @param currentNode
+	 * @param playoutResult
+	 */
 	public static void MCTS_Backpropagation(Node currentNode, double playoutResult) {
 		Node tempNode = currentNode;
 		while (tempNode != null) {
@@ -236,24 +253,22 @@ public class MyTools {
 
 			if(playoutResult==0.5) {
 				tempNode.setWinScore(tempNode.getWinScore()+0.5);
-				// tempNode.setWinScore(tempNode.getWinScore() + 0.5 * tempNode.heuristic);
-
 			}
 			// playoutResult is the ID of the player that won
 			else if (tempNode.getState().getTurnPlayer() == playoutResult) {
 				tempNode.setWinScore(tempNode.getWinScore() + 1);
-				// tempNode.setWinScore(tempNode.getWinScore() + tempNode.heuristic);
 			}
 			tempNode = tempNode.getParent();	
 		}
 	}
 
+	//add priority of the tiles based on if it leads to continuous path or blocked path
 	public static void addPriorityTiles() {
 
+		//add indexes of tiles in different priority lists
 		String[] firstPriority = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
 		String[] secondPriority = {"5_flip", "7", "9_flip", "1"};
 		String[] thirdPriority = {"2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "14", "14_flip", "15", "13"};
-
 
 		for(String tile: firstPriority) map.put(tile, 100);
 		for(String tile: secondPriority) map.put(tile, 50);

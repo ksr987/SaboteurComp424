@@ -14,18 +14,6 @@ public class Node {
     double winScore;
     double heuristic;
     
-//    public Node(Node parent, List<Node> childArray, int winScore, int visitCount, int turn) {
-//    	
-//    	this.parent = parent;
-//    	this.visitCount = visitCount;
-//    	this.winScore = winScore;
-//    	
-//    	if(childArray !=null) {
-//    		this.childArray = new ArrayList<Node>(childArray);
-//    	}
-//    	
-//    }
-    
     public Node(SaboteurBoardStateClone state) {
         this.state = state;
         this.childArray = new ArrayList<>();

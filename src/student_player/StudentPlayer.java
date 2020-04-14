@@ -11,10 +11,13 @@ import Saboteur.SaboteurBoardState;
 /** A player file submitted by a student. */
 public class StudentPlayer extends SaboteurPlayer {
 
+	/*
+	 * Student IDs of both team members initialized to a final variable
+	 */
 	private static final String KETAN_SID = "260732873";
 	private static final String ALAIN_SID = "260714615";
+	
 	private static final int timeout = 2;
-	public static int player_id;
 	
     /**
      * You must modify this constructor to return your student number. This is
@@ -22,6 +25,7 @@ public class StudentPlayer extends SaboteurPlayer {
      * associate you with your agent. The constructor should do nothing else.
      */
     public StudentPlayer() {
+    	
         super(ALAIN_SID);
     }
     					
@@ -32,6 +36,7 @@ public class StudentPlayer extends SaboteurPlayer {
      */
     public Move chooseMove(SaboteurBoardState boardState) {
     	
+    	//add priorities of tiles in the hashmap
     	if (MyTools.map.isEmpty()) MyTools.addPriorityTiles();
     	
     	long initial = System.currentTimeMillis();
@@ -40,8 +45,8 @@ public class StudentPlayer extends SaboteurPlayer {
     	Tree tree = new Tree(clonedState);
     	Node rootNode = tree.getRoot();
     	
-//    	// TODO: should be less than 2000, but by how much? see how much the rest of the function (after while loop) takes and add a margin of safety
-    	while (System.currentTimeMillis() - initial < (timeout * 1000)) {
+    	//perform MCTS steps before the timeout of 2 sec (with a safety gap)
+    	while (System.currentTimeMillis() - initial < (timeout * 999)) {
     				
     		// Selection
     		Node selectedNode = MyTools.MCTS_Selection(rootNode);
@@ -50,10 +55,12 @@ public class StudentPlayer extends SaboteurPlayer {
     		if (!selectedNode.state.gameOver()) {
     			MyTools.MCTS_Expansion(selectedNode);
     		}
+    		
     		// Simulation
     		Node simulation_node = selectedNode;
     		if (selectedNode.getChildArray().size() > 0) {
     			List<Node> childArray = selectedNode.getChildArray();
+    			//find move to play with max heuristic
     			double maxHeuristic = Integer.MIN_VALUE;
     			Node maxNode = childArray.get(0);
     			for(Node node: childArray) {
@@ -62,11 +69,10 @@ public class StudentPlayer extends SaboteurPlayer {
     					maxNode = node;
     				}
     			}
-    			System.out.println(maxNode.heuristic);
-    			//int random_index = (int) (childArray.size() * Math.random());
     			simulation_node = maxNode;
     		}
     		
+    		//store result of simulation
     		double playoutResult = MyTools.MCTS_Simulation(simulation_node);
     		
     		// Backpropagation
@@ -86,8 +92,9 @@ public class StudentPlayer extends SaboteurPlayer {
     	tree.setRoot(picked_node);
     	
     	Move myMove = picked_node.getMovePlayed();
+    	
+    	//verify if the move associated with the picked node is legal
     	if (!boardState.isLegal(picked_node.getMovePlayed())) {
-    		System.out.println("Move is illegal");
     		myMove = boardState.getRandomMove();
     	}
         return myMove;
