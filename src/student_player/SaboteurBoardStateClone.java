@@ -8,7 +8,12 @@ import boardgame.BoardState;
 
 import java.util.*;
 
-
+/**
+ * This class clones the original board state in order to be able
+ * to expand the several moves that can be played on the same instance of the board
+ * @author Ketan, Alain
+ *
+ */
 public class SaboteurBoardStateClone extends BoardState {
 	public static final int BOARD_SIZE = 14;
 	public static final int originPos = 5;

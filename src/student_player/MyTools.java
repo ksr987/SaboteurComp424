@@ -32,15 +32,13 @@ public class MyTools {
 
 		SaboteurCard cardPlayed = move.getCardPlayed();
 
-		/**
-		 * For Bonus, if it is a legal move, then we are malused and we should play it anyway
+		/* For Bonus, if it is a legal move, then we are malused and we should play it anyway
 		 * It is more important than a map
 		 */
 		if (cardPlayed instanceof SaboteurBonus)
 			return 100000;
 
-		/**
-		 * For Map, it would matter way more to play it when the nugget is not revealed yet, 
+		/* For Map, it would matter way more to play it when the nugget is not revealed yet, 
 		 * and would not have any use otherwise
 		 */
 		else if (cardPlayed instanceof SaboteurMap) {
@@ -48,26 +46,25 @@ public class MyTools {
 			else return 10000; 
 		}
 
-		/**
-		 * For Malus, it is a sounder idea to play it towards the end, because at the beginning we 
+		/* For Malus, it is a sounder idea to play it towards the end, because at the beginning we 
 		 * are both working towards reaching the hidden tiles, but at the end we want to prevent the 
 		 * opponent from doing so. Plus, it is more likely that the agent would have dropped Bonuses 
 		 * throughout the game because they are not as high of a priority, so it may be scarce of it by the end.
-
 		 */
 		else if (cardPlayed instanceof SaboteurMalus) {
 			if (boardState.getTurnNumber() < 25) return 0;
 			else return 100;
 		}
-		/**
-		 * For Destroy, it matters more which card are we destroying, so we set a heuristic score 
+		
+		/* For Destroy, it matters more which card are we destroying, so we set a heuristic score 
 		 * according to that. However, it also matters not to sabotage ourselves, and the path the 
 		 * we are building. We can compute the most likely path since we know our cards and the cards 
 		 * that can be played from the opponent and those that can be drawn. 
 		 */
 		
-		//Destroy the cards that are playing outwards (away from the path from entrance to hidden objective 
-		//giving more priority to the tiles closer to hidden objective
+		/*Destroy the cards that are playing outwards (away from the path from entrance to hidden objective 
+		*giving more priority to the tiles closer to hidden objective
+		*/
 		else if (cardPlayed instanceof SaboteurDestroy) {
 			
 			int xpos = move.getPosPlayed()[0];
@@ -136,7 +133,18 @@ public class MyTools {
 		
 		return true;
 	}
+	
+	/**
+	 * This method finds the move from the current set of legal moves that would lead us closest to the nugget
+	 * It uses hypothenuse formula, but it's better to compare from the 1-end of the card path.
+	 * An improvement would be Manhattan distance, (knowing our cards and 
+	 * estimating the cards left to draw using knowledge of the cards played) from all possible paths and picking 
+	 * (and sticking to) the least.
 
+	 * @param nuggetPosition
+	 * @param legalMoves
+	 * @return SaboteurMove the closest move
+	 */
 	public static SaboteurMove findClosestMove(int[] nuggetPosition, ArrayList<SaboteurMove> legalMoves) {
 		double currentMin = Integer.MAX_VALUE;
 		SaboteurMove minMove = legalMoves.get(0);
@@ -262,7 +270,11 @@ public class MyTools {
 		}
 	}
 
-	//add priority of the tiles based on if it leads to continuous path or blocked path
+	/**
+	 * Add priority of the tiles based on if it leads to continuous path or blocked path
+	 * we split them into three categories of priority i.e. the more versatile ones, the deadends, 
+	 * and the rest (at priority 2)
+	 */
 	public static void addPriorityTiles() {
 
 		//add indexes of tiles in different priority lists
