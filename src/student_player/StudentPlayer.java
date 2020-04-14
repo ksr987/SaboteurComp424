@@ -4,6 +4,7 @@ import boardgame.Move;
 
 import Saboteur.SaboteurPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Saboteur.SaboteurBoardState;
@@ -69,6 +70,7 @@ public class StudentPlayer extends SaboteurPlayer {
     					maxNode = node;
     				}
     			}
+    			System.out.println("Picked node " + maxNode.getMovePlayed() + "with heuristic " + maxNode.heuristic);
     			simulation_node = maxNode;
     		}
     		

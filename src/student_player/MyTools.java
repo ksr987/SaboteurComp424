@@ -85,17 +85,35 @@ public class MyTools {
 		 */
 		else if (cardPlayed instanceof SaboteurTile) {
 			double distance;
-			if (boardState.isNuggetFound()) {
-				int[] goldenNuggetPosition = boardState.getNuggetPosition();
-				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - goldenNuggetPosition[0], 2) + Math.pow(move.getPosPlayed()[1] - goldenNuggetPosition[1], 2));
-			}
-
+			int[] beginningPosition;
+			int[] endPosition = new int[2];
+			
+			// check whether there is a card path from card played to origin, otherwise the distance becomes that of origin to nugget or tile
+	    	ArrayList<int[]> originTargets = new ArrayList<int[]>();
+	    	int[] pos = {5, 5};
+	    	originTargets.add(pos);
+	    	int[] targetPos = move.getPosPlayed();
+			boolean cardPath = boardState.cardPath(originTargets, targetPos, true);
+			
+			if (cardPath) beginningPosition = move.getPosPlayed();
+			else beginningPosition = originTargets.get(0);
+			
+			if (boardState.isNuggetFound()) endPosition = boardState.getNuggetPosition();
 			else {
-				distance = Math.sqrt(Math.pow(move.getPosPlayed()[0] - hiddenPos[1][0], 2) + Math.pow(move.getPosPlayed()[1] - hiddenPos[1][1], 2));
+				endPosition[0] = hiddenPos[1][0];
+				endPosition[1] = hiddenPos[1][1];
 			}
+			
+			System.out.println("Beginning Position is " + beginningPosition[0] + " " + beginningPosition[1]);
+			System.out.println("Ending Position is " + endPosition[0] + " " + endPosition[1]);
+			
+			distance = Math.sqrt(Math.pow(endPosition[1] - beginningPosition[1], 2) + Math.pow(endPosition[0] - beginningPosition[0], 2));
+			
+
 			String idx = ((SaboteurTile) cardPlayed).getIdx();
 			int priority = map.get(idx);
 			boolean isInwards = playedInwards(move, boardState);
+		
 			if (isInwards) return priority / distance;
 			return 0;
 		}
@@ -171,7 +189,7 @@ public class MyTools {
 		// while we still haven't reached a leaf...
 		while(parentNode.getChildArray().size()>0) {
 			double max_uct = 0;
-			Node currentNode = parentNode;
+			Node currentNode = parentNode.getChildArray().get(0);
 
 			// find the child node with maximum UCT
 
