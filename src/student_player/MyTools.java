@@ -16,8 +16,8 @@ import Saboteur.cardClasses.SaboteurTile;
 
 public class MyTools {
 
-	static HashMap<String, Integer> map = new HashMap<String, Integer>();
-	
+	static HashMap<String, Integer> opening_map = new HashMap<String, Integer>();
+
 	/*
 	 * hiddenPos: position of hidden objectives in the board
 	 * LOW_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY: Priorities set for different types of tiles  
@@ -55,66 +55,99 @@ public class MyTools {
 			if (boardState.getTurnNumber() < 25) return 0;
 			else return 100;
 		}
-		
-		/* For Destroy, it matters more which card are we destroying, so we set a heuristic score 
-		 * according to that. However, it also matters not to sabotage ourselves, and the path the 
-		 * we are building. We can compute the most likely path since we know our cards and the cards 
-		 * that can be played from the opponent and those that can be drawn. 
-		 */
-		
+
 		/*Destroy the cards that are playing outwards (away from the path from entrance to hidden objective 
-		*giving more priority to the tiles closer to hidden objective
-		*/
+		 *giving more priority to the tiles closer to hidden objective
+		 */
 		else if (cardPlayed instanceof SaboteurDestroy) {
-			
+
 			int xpos = move.getPosPlayed()[0];
 			int ypos = move.getPosPlayed()[1];
-			
+
 			if(boardState.getHiddenBoard()[xpos][ypos]!=null) {
-				
+
 				if(playedInwards(move, boardState)) return -100;
 				else return 100;
 			}
-			
+
 		}
 
-		/**
-		 * For each tile, depending on if the golden nugget has been revealed, we set the heuristic as the 
-		 * hypotenuse distance from the position of the tile to the golden nugget if it has been revealed
-		 * otherwise, we calculate the hypotenuse distance to the middle hidden objective
+		/* The heuristic for a card is slightly more complex. It considers
+		 * - the distance to the objective. 
+		 * 		To is selected as: If the objective is found, it is the distance from card to golden nugget position. Else, it is the middle hidden card position (might change that if hidden placed at random)
+		 * 		From is selected: If there is a path form the origin to the card, then the distance is from card, otherwise it's from origin (that's to give more priority to restore a broken path rather than extend it further)
+		 * - the priority of the tile (pre-defined, but might consider dynamically changing based on other factors i.e. are we at end game?)
+		 * - the direction of the tile. If there is end inwards (not going above entrance, or beyond hidden...), then it is TRUE (set to 1). Otherwise, set to FALSE 
 		 */
 		else if (cardPlayed instanceof SaboteurTile) {
 			double distance;
 			int[] beginningPosition;
 			int[] endPosition = new int[2];
-			
-			// check whether there is a card path from card played to origin, otherwise the distance becomes that of origin to nugget or tile
-	    	ArrayList<int[]> originTargets = new ArrayList<int[]>();
-	    	int[] pos = {5, 5};
-	    	originTargets.add(pos);
-	    	int[] targetPos = move.getPosPlayed();
+
+			// Heuristic 1: Distance; check whether there is a card path from card played to origin, otherwise the distance becomes that of origin to nugget or tile
+
+			ArrayList<int[]> originTargets = new ArrayList<int[]>();
+			int[] pos = {5, 5};
+			originTargets.add(pos);
+			int[] targetPos = move.getPosPlayed();
 			boolean cardPath = boardState.cardPath(originTargets, targetPos, true);
-			
+
 			if (cardPath) beginningPosition = move.getPosPlayed();
 			else beginningPosition = originTargets.get(0);
-			
+
 			if (boardState.isNuggetFound()) endPosition = boardState.getNuggetPosition();
 			else {
 				endPosition[0] = hiddenPos[1][0];
 				endPosition[1] = hiddenPos[1][1];
 			}
-			
-			System.out.println("Beginning Position is " + beginningPosition[0] + " " + beginningPosition[1]);
-			System.out.println("Ending Position is " + endPosition[0] + " " + endPosition[1]);
-			
-			distance = Math.sqrt(Math.pow(endPosition[1] - beginningPosition[1], 2) + Math.pow(endPosition[0] - beginningPosition[0], 2));
-			
 
-			String idx = ((SaboteurTile) cardPlayed).getIdx();
-			int priority = map.get(idx);
+			distance = Math.sqrt(Math.pow(endPosition[1] - beginningPosition[1], 2) + Math.pow(endPosition[0] - beginningPosition[0], 2));
+
+			// Heuristic 2: Priority
+
+			String cardIndex = ((SaboteurTile) cardPlayed).getIdx();
+			int priority = 0;
+			// Heuristic 3: Whether the move is played towards the hidden tiles or not
 			boolean isInwards = playedInwards(move, boardState);
-		
-			if (isInwards) return priority / distance;
+			
+			if (isInwards) {
+				if (!boardState.isNuggetFound()) priority = opening_map.get(cardIndex);
+				else {
+					int[] tilePosition = move.getPosPlayed();
+					int[][] tilePath = ((SaboteurTile) move.getCardPlayed()).getPath();
+					boolean topMiddleOpen = tilePath[1][2] ==1;
+					boolean leftMiddleOpen = tilePath[0][1] ==1;
+					boolean rightMiddleOpen = tilePath[2][1] ==1;
+					boolean bottomMiddleOpen = tilePath[1][0] ==1;
+					int[] nuggetPosition = boardState.getNuggetPosition();
+					// upper left quadrant
+					if (tilePosition[0] < nuggetPosition[0] && tilePosition[1] < nuggetPosition[1]) {
+						// if open on down and/or right...
+						if (topMiddleOpen) priority += 50;
+						if (bottomMiddleOpen) priority += 50;
+					}
+					// lower left quadrant
+					else if (tilePosition[0] < nuggetPosition[0] && tilePosition[1] > nuggetPosition[1]) {
+						// if open on up and/or right...
+						if (topMiddleOpen) priority += 50;
+						if (rightMiddleOpen) priority += 50;
+						
+					}
+					// upper right quadrant
+					else if (tilePosition[0] > nuggetPosition[0] && tilePosition[1] < nuggetPosition[1]) {
+						// if open on down and/or left...
+						if (bottomMiddleOpen) priority += 50;
+						if (leftMiddleOpen) priority += 50;
+					}
+					// lower right quadrant
+					else if (tilePosition[0] > nuggetPosition[0] && tilePosition[1] > nuggetPosition[1]) {
+						// if open on up and/or left
+						if (topMiddleOpen) priority += 50;
+						if (leftMiddleOpen) priority += 50;
+					}
+				}
+				return priority / distance;
+			}
 			return 0;
 		}
 		return 0;
@@ -122,36 +155,36 @@ public class MyTools {
 
 	//checks if the tile played is towards the hidden objectives, or away from it based on the tile path and the position of the move
 	private static boolean playedInwards(SaboteurMove move, SaboteurBoardStateClone boardState) {
-		
+
 		//this method only valid for SaboteurTile instance
 		if(!(move.getCardPlayed() instanceof SaboteurTile)) return false;
-		
+
 		int[][] tilePath = ((SaboteurTile) move.getCardPlayed()).getPath();
 		boolean topMiddleOpen = tilePath[1][2] ==1;
 		boolean leftMiddleOpen = tilePath[0][1] ==1;
 		boolean rightMiddleOpen = tilePath[2][1] ==1;
 		boolean bottomMiddleOpen = tilePath[1][0] ==1;
-		
+
 		//left square
 		//consider only 3 edges as the common edge can be flexible
-		
+
 		//top edge
 		if(move.getPosPlayed()[1]<=5 && !(leftMiddleOpen || rightMiddleOpen || bottomMiddleOpen) && topMiddleOpen) return false;
-		
+
 		//left edge
 		if(move.getPosPlayed()[0]<=3 && !(topMiddleOpen || rightMiddleOpen || bottomMiddleOpen) && leftMiddleOpen) return false;
-		
+
 		//bottom edge
 		if(move.getPosPlayed()[1]>=12 && !(topMiddleOpen || rightMiddleOpen || leftMiddleOpen) && bottomMiddleOpen) return false;
-		
+
 		//right square
-		
+
 		//right edge
 		if(move.getPosPlayed()[0]>=7 && !(topMiddleOpen || leftMiddleOpen || bottomMiddleOpen) && rightMiddleOpen) return false;
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * This method finds the move from the current set of legal moves that would lead us closest to the nugget
 	 * It uses hypothenuse formula, but it's better to compare from the 1-end of the card path.
@@ -234,7 +267,7 @@ public class MyTools {
 			}
 		}
 	}
-	
+
 	/**
 	 * Simulate the game play by taking the leaf node, and running the subsequent moves randomly
 	 * @param currentNode
@@ -296,12 +329,12 @@ public class MyTools {
 	public static void addPriorityTiles() {
 
 		//add indexes of tiles in different priority lists
-		String[] firstPriority = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
-		String[] secondPriority = {"5_flip", "7", "9_flip", "1"};
-		String[] thirdPriority = {"2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "14", "14_flip", "15", "13"};
+		String[] firstPriority_opening = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
+		String[] secondPriority_opening = {"5_flip", "7", "9_flip", "1"};
+		String[] thirdPriority_opening = {"2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "14", "14_flip", "15", "13"};
 
-		for(String tile: firstPriority) map.put(tile, 100);
-		for(String tile: secondPriority) map.put(tile, 50);
-		for(String tile: thirdPriority) map.put(tile, 0);		
+		for(String tile: firstPriority_opening) opening_map.put(tile, 100);
+		for(String tile: secondPriority_opening) opening_map.put(tile, 50);
+		for(String tile: thirdPriority_opening) opening_map.put(tile, 0);	
 	}
 }

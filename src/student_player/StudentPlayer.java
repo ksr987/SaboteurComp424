@@ -38,7 +38,7 @@ public class StudentPlayer extends SaboteurPlayer {
     public Move chooseMove(SaboteurBoardState boardState) {
     	
     	//add priorities of tiles in the hashmap
-    	if (MyTools.map.isEmpty()) MyTools.addPriorityTiles();
+    	if (MyTools.opening_map.isEmpty()) MyTools.addPriorityTiles();
     	
     	long initial = System.currentTimeMillis();
     	
