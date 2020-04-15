@@ -16,7 +16,9 @@ import Saboteur.cardClasses.SaboteurTile;
 
 public class MyTools {
 
-	static HashMap<String, Integer> opening_map = new HashMap<String, Integer>();
+	static HashMap<String, Integer> map = new HashMap<String, Integer>();
+	static ArrayList<String> row_12_priority = new ArrayList<String>();
+	
 
 	/*
 	 * hiddenPos: position of hidden objectives in the board
@@ -28,9 +30,12 @@ public class MyTools {
 	final double HIGH_PRIORITY = 100.0;
 
 	//Evaluation function that returns the heuristic of a legal move based on the board state
-	public static double evaluateGreedyMove(SaboteurBoardStateClone boardState, SaboteurMove move) {
-
+	public static double evaluateGreedyMove(Node node, SaboteurMove move) {
+		SaboteurBoardStateClone boardState = node.getState();
 		SaboteurCard cardPlayed = move.getCardPlayed();
+
+		// will be useful to know the state before playing Destroy and Map
+		SaboteurBoardStateClone parentBoardState = node.getParent().getState();
 
 		/* For Bonus, if it is a legal move, then we are malused and we should play it anyway
 		 * It is more important than a map
@@ -42,8 +47,37 @@ public class MyTools {
 		 * and would not have any use otherwise
 		 */
 		else if (cardPlayed instanceof SaboteurMap) {
-			if (boardState.isNuggetFound()) return -100; // No use playing Map if already know the position of nugget
-			else return 10000; 
+			if (parentBoardState.isNuggetFound()) return -100; // No use playing Map if already know the position of nugget
+			int positionPlayed = 0;
+
+			for (int i = 0; i < hiddenPos.length; i++) {
+				if (move.getPosPlayed()[0] == hiddenPos[i][0] && move.getPosPlayed()[1] == hiddenPos[i][1])
+					positionPlayed = i;
+			}
+			// very confusing, but if we see current board state, the card has already been played so it's already
+			// revealed. Therefore, should look at two states above to get our state the turn before (we have to look
+			// one more up as we cannot see our cards from the opponent's perspective during his turn)
+			try {
+				//				SaboteurBoardStateClone grandparentBoardState = node.getParent().getParent().getState();
+				if (boardState.getTurnPlayer() == 1) {
+					if (parentBoardState.player2hiddenRevealed[positionPlayed]) {
+						return -100;
+					}
+				} else if (parentBoardState.player1hiddenRevealed[positionPlayed]) {
+					return -100;
+				}
+			} catch (Exception e) {
+				System.out.println("No grandparent yet");
+			}
+
+			//			int positionPlayed = 0;
+			//			for (int i = 0; i < hiddenPos.length; i++) {
+			//				if (move.getPosPlayed()[0] == hiddenPos[i][0] && move.getPosPlayed()[1] == hiddenPos[i][1])
+			//					positionPlayed = i;
+			//			}
+			//			if (clonedState.getTurnPlayer() == 1 && clonedState.player1hiddenRevealed[positionPlayed]) continue;
+			//			if (clonedState.getTurnPlayer() == 2 && clonedState.player2hiddenRevealed[positionPlayed]) continue;
+			return 10000; 
 		}
 
 		/* For Malus, it is a sounder idea to play it towards the end, because at the beginning we 
@@ -52,35 +86,65 @@ public class MyTools {
 		 * throughout the game because they are not as high of a priority, so it may be scarce of it by the end.
 		 */
 		else if (cardPlayed instanceof SaboteurMalus) {
-			if (boardState.getTurnNumber() < 25) return 0;
+			if (boardState.getTurnNumber() < 30) return 0;
 			else return 100;
+		}
+
+		/* For Drop, if you have Map, and nugget is revealed, it doesn't make sense to have it
+		 * Same for deadends, they're just going to block path
+		 */
+		else if (cardPlayed instanceof SaboteurDrop) {
+			SaboteurCard cardDropped = boardState.getCurrentPlayerCards().get(move.getPosPlayed()[0]);
+			if (cardDropped instanceof SaboteurMap && boardState.isNuggetFound()) {
+				return 10000000;
+			}
+			else if (cardDropped instanceof SaboteurTile) {
+				String index = ((SaboteurTile) cardDropped).getIdx();
+				if (map.get(index) == 0) {
+					return 10;
+				}
+			}
 		}
 
 		/*Destroy the cards that are deadends and blocking a path from origin to a hidden tile
 		 */
 		else if (cardPlayed instanceof SaboteurDestroy) {
 
-			int xpos = move.getPosPlayed()[0];
-			int ypos = move.getPosPlayed()[1];
-			
-			ArrayList<int[]> originTargets = new ArrayList<int[]>();
-			for (int[] pos : hiddenPos) originTargets.add(pos);
-			int[] targetPos = {5, 5};
-			boolean cardPathUsingCard = boardState.cardPath(originTargets, targetPos, true);
-			boolean cardPathUsing1 = boardState.cardPath(originTargets, targetPos, false);
 
-			// if there is a card path from origin to a hidden tile but there is no path of 1s, then 
-			// we can say that the road is blocked by a deadend card, we should remove it.
-			// Note the exclusive or (we want either one or the other, but not both at same time)
-			
-			if (cardPathUsingCard ^ cardPathUsing1) {
-				// get the tile at the position of the Destroy card
-				SaboteurTile tile = boardState.getBoardForDisplay()[xpos][ypos];
-				// third priority are deadends and have score 0
-				if (opening_map.get(tile.getIdx()) == 0) return 10000000;
-			}
-			return 0;
+			//
+			//			ArrayList<int[]> originTargets = new ArrayList<int[]>();
+			//			for (int[] pos : hiddenPos) originTargets.add(pos);
+			//			int[] targetPos = {5, 5};
+			//			
+			//			boolean cardPathUsingCard = boardState.cardPath(originTargets, targetPos, true);
+			//			boolean cardPathHidden = boardState.pathToHidden(new SaboteurTile[]{new SaboteurTile("nugget"),new SaboteurTile("hidden1"),new SaboteurTile("hidden2")});
+			//
+			//			// if there is a card path from origin to a hidden tile but there is no path of 1s, then 
+			//			// we can say that the road is blocked by a deadend card, we should remove it.
+			//			// Note the exclusive or (we want either one or the other, but not both at same time)
+			//
+			//			if (cardPathUsingCard ^ cardPathHidden) {
+			//				// get the tile at the position of the Destroy card
+			//				SaboteurTile tile = boardState.getBoardForDisplay()[xpos][ypos];
+			//				// third priority are deadends and have score 0
+			//				if (opening_map.get(tile.getIdx()) == 0) return 10000000;
+			//			}
+			//			return 0;
+
+			SaboteurTile cardPlayedOn = parentBoardState.getBoardForDisplay()[move.getPosPlayed()[0]][move.getPosPlayed()[1]];
+			if (move.getPosPlayed()[0] == 12 && !row_12_priority.contains(cardPlayedOn.getIdx())) return 1000000000;
+			if (map.get(cardPlayedOn.getIdx()) == 0) // we know it's 0 priority, deadend
+				// TODO: better design, add "isInSquare" method
+				if (move.getPosPlayed()[0] > 5 && move.getPosPlayed()[1] >= 3 && move.getPosPlayed()[1] <= 7) {
+//					ArrayList<int[]> originTargets = new ArrayList<int[]>();
+//					for (int[] pos : hiddenPos) originTargets.add(pos);
+//					int[] targetPos = new int[] {5, 5};
+//					boolean cardPath = boardState.cardPath(originTargets, targetPos, true);
+//					if (cardPath) 
+					return 100000000;
+				}
 		}
+
 
 		/* The heuristic for a card is slightly more complex. It considers
 		 * - the distance to the objective. 
@@ -94,12 +158,14 @@ public class MyTools {
 			int[] beginningPosition;
 			int[] endPosition = new int[2];
 
-			// Heuristic 1: Distance; check whether there is a card path from card played to origin, otherwise the distance becomes that of origin to nugget or tile
-
+			// check whether there is a card path from card played to origin, otherwise the distance becomes that of origin to nugget or tile
 			ArrayList<int[]> originTargets = new ArrayList<int[]>();
 			int[] pos = {5, 5};
 			originTargets.add(pos);
 			int[] targetPos = move.getPosPlayed();
+
+			if (isSuperMove(boardState, move)) return 1000000;
+
 			boolean cardPath = boardState.cardPath(originTargets, targetPos, true);
 
 			if (cardPath) beginningPosition = move.getPosPlayed();
@@ -113,54 +179,46 @@ public class MyTools {
 
 			distance = Math.sqrt(Math.pow(endPosition[1] - beginningPosition[1], 2) + Math.pow(endPosition[0] - beginningPosition[0], 2));
 
-			// Heuristic 2: Priority
-
-			String cardIndex = ((SaboteurTile) cardPlayed).getIdx();
-			int priority = 0;
-			// Heuristic 3: Whether the move is played towards the hidden tiles or not
+			String idx = ((SaboteurTile) cardPlayed).getIdx();
+			int priority = map.get(idx);
 			boolean isInwards = playedInwards(move, boardState);
-			
-			if (isInwards) {
-				if (!boardState.isNuggetFound()) priority = opening_map.get(cardIndex);
-				else {
-					int[] tilePosition = move.getPosPlayed();
-					int[][] tilePath = ((SaboteurTile) move.getCardPlayed()).getPath();
-					boolean topMiddleOpen = tilePath[1][2] ==1;
-					boolean leftMiddleOpen = tilePath[0][1] ==1;
-					boolean rightMiddleOpen = tilePath[2][1] ==1;
-					boolean bottomMiddleOpen = tilePath[1][0] ==1;
-					int[] nuggetPosition = boardState.getNuggetPosition();
-					// upper left quadrant
-					if (tilePosition[0] < nuggetPosition[0] && tilePosition[1] < nuggetPosition[1]) {
-						// if open on down and/or right...
-						if (topMiddleOpen) priority += 50;
-						if (bottomMiddleOpen) priority += 50;
-					}
-					// lower left quadrant
-					else if (tilePosition[0] < nuggetPosition[0] && tilePosition[1] > nuggetPosition[1]) {
-						// if open on up and/or right...
-						if (topMiddleOpen) priority += 50;
-						if (rightMiddleOpen) priority += 50;
-						
-					}
-					// upper right quadrant
-					else if (tilePosition[0] > nuggetPosition[0] && tilePosition[1] < nuggetPosition[1]) {
-						// if open on down and/or left...
-						if (bottomMiddleOpen) priority += 50;
-						if (leftMiddleOpen) priority += 50;
-					}
-					// lower right quadrant
-					else if (tilePosition[0] > nuggetPosition[0] && tilePosition[1] > nuggetPosition[1]) {
-						// if open on up and/or left
-						if (topMiddleOpen) priority += 50;
-						if (leftMiddleOpen) priority += 50;
-					}
-				}
-				return priority / distance;
-			}
+
+			if (isInwards) return priority / distance;
 			return 0;
 		}
 		return 0;
+	}
+
+	private static boolean isSuperMove(SaboteurBoardStateClone boardState, SaboteurMove move) {
+		String index = ((SaboteurTile) move.getCardPlayed()).getIdx();
+		int xPos = move.getPosPlayed()[1];
+		int yPos = move.getPosPlayed()[0];
+
+		if (yPos == 12) {
+			if (xPos < 3) {
+				if (index == "8" || index == "9" || index == "9_flip" || index == "10" || index == "6_flip" || index == "7" || index == "5") return true;		
+			}
+			if (xPos > 7) {
+				if (index == "8" || index == "9" || index == "9_flip" || index == "10" || index == "6" || index == "7_flip" || index == "5_flip") return true;		
+			}
+			else {
+				if (index == "8" || index == "9" || index == "9_flip" || index == "7" || index == "10" || index == "7_flip" || index == "5_flip" || index == "7" || index == "5") return true;		
+			}
+		}
+//		if (yPos == 11) {
+//			if (xPos < 3) {
+//				if (index == "0" || index == "6_flip" || index == "7" || index == "8") return true;		
+//			}
+//			if (xPos > 7) {
+//				if (index == "0" || index == "6_flip" || index == "7" || index == "8") return true;		
+//			}
+//			else {
+//				if (index == "0" || index == "9_flip" || index == "7" || index == "8") return true;		
+//
+//			}
+//		}
+
+		return false;
 	}
 
 	//checks if the tile played is towards the hidden objectives, or away from it based on the tile path and the position of the move
@@ -266,9 +324,11 @@ public class MyTools {
 		for (SaboteurMove move : legal_moves) {
 			try {
 				clonedState = new SaboteurBoardStateClone(selectedNode.getState());
+
 				SaboteurBoardStateClone newClonedState = clonedState.processMove(move);
-				double heuristic = MyTools.evaluateGreedyMove(clonedState, move);
-				Node node = new Node(newClonedState, selectedNode, move, heuristic);
+				Node node = new Node(newClonedState, selectedNode, move);
+				double heuristic = MyTools.evaluateGreedyMove(node, move);
+				node.setHeuristic(heuristic);
 				// Here, we should be adding nodes in descending order of their heuristic so that in simulation
 				// we pick the one
 				selectedNode.getChildArray().add(node);
@@ -305,7 +365,9 @@ public class MyTools {
 
 		}
 		int winner = clonedState.getWinner();
-		if (winner == currentNode.getState().getTurnPlayer()) return 1;	// our player won
+		if (winner == currentNode.getState().getTurnPlayer()) {
+			return 1;	// our player won
+		}
 		else if (winner == Integer.MAX_VALUE) return 0.5;	// it's a draw
 		else return 0; //our player lost
 	}
@@ -339,12 +401,15 @@ public class MyTools {
 	public static void addPriorityTiles() {
 
 		//add indexes of tiles in different priority lists
-		String[] firstPriority_opening = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
-		String[] secondPriority_opening = {"5_flip", "7", "9_flip", "1"};
-		String[] thirdPriority_opening = {"2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "14", "14_flip", "15", "13"};
+		String[] firstPriority = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
+		String[] secondPriority = {"5_flip", "7", "9_flip", "1"};
+		String[] thirdPriority = {"2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "14", "14_flip", "15", "13"};
 
-		for(String tile: firstPriority_opening) opening_map.put(tile, 100);
-		for(String tile: secondPriority_opening) opening_map.put(tile, 50);
-		for(String tile: thirdPriority_opening) opening_map.put(tile, 0);	
+		for(String tile: firstPriority) map.put(tile, 100);
+		for(String tile: secondPriority) map.put(tile, 50);
+		for(String tile: thirdPriority) map.put(tile, 0);		
+		
+		String[] arr = {"8", "9", "9_flip", "7", "10", "7_flip", "5_flip", "7", "5"};
+		for (String a : arr) row_12_priority.add(a);
 	}
 }

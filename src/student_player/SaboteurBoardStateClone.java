@@ -32,8 +32,8 @@ public class SaboteurBoardStateClone extends BoardState {
 	private ArrayList<SaboteurCard> player2Cards; //hand of player 2
 	private int player1nbMalus;
 	private int player2nbMalus;
-	private boolean[] player1hiddenRevealed = {false,false,false};
-	private boolean[] player2hiddenRevealed = {false,false,false};
+	public boolean[] player1hiddenRevealed = {false,false,false};
+	public boolean[] player2hiddenRevealed = {false,false,false};
 
 	private ArrayList<SaboteurCard> Deck; //deck form which player pick
 	public static final int[][] hiddenPos = {{originPos+7,originPos-2},{originPos+7,originPos},{originPos+7,originPos+2}};
@@ -48,7 +48,7 @@ public class SaboteurBoardStateClone extends BoardState {
 
 	public SaboteurBoardStateClone(SaboteurBoardState boardState) {
 		SaboteurTile[][] clonedBoard = boardState.getBoardForDisplay();
-		int[][] clonedIntBoard = boardState.getHiddenIntBoard();
+		int[][] clonedIntBoard = boardState.getHiddenIntBoard_corrected();
 
 		
 		// initialize cloned board
@@ -146,7 +146,7 @@ public class SaboteurBoardStateClone extends BoardState {
 	
 	public SaboteurBoardStateClone(SaboteurBoardStateClone boardState) {
 		SaboteurTile[][] clonedBoard = boardState.getBoardForDisplay();
-		int[][] clonedIntBoard = boardState.getHiddenIntBoard();
+		int[][] clonedIntBoard = boardState.getHiddenIntBoard_corrected();
 
 		
 		// initialize cloned board
@@ -387,6 +387,56 @@ public class SaboteurBoardStateClone extends BoardState {
 		}
 
 		return this.intBoard; }
+	
+	public int[][] getHiddenIntBoard_corrected() {
+        //update the int board, and provide it to the player with the hidden objectives set at EMPTY.
+        //Note that this function is available to the player.
+        //Corrected version.
+        boolean[] listHiddenRevealed;
+        if(turnPlayer==1) listHiddenRevealed= player1hiddenRevealed;
+        else listHiddenRevealed = player2hiddenRevealed;
+        int[][] playerIntBoard = new int[BOARD_SIZE*3][BOARD_SIZE*3];
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if(this.board[i][j] == null){
+                    for (int k = 0; k < 3; k++) {
+                        for (int h = 0; h < 3; h++) {
+                        	playerIntBoard[i * 3 + k][j * 3 + h] = EMPTY;
+                        }
+                    }
+                }
+                else {
+                    boolean isAnHiddenObjective = false;
+                    for(int h=0;h<3;h++) {
+                        if(this.board[i][j].getIdx().equals(this.hiddenCards[h].getIdx())){
+                            if(!listHiddenRevealed[h]){
+                                isAnHiddenObjective = true;
+                            }
+                            break;
+                        }
+                    }
+                    if(!isAnHiddenObjective) {
+                        int[][] path = this.board[i][j].getPath();
+                        for (int k = 0; k < 3; k++) {
+                            for (int h = 0; h < 3; h++) {
+                                playerIntBoard[i * 3 + k][j * 3 + h] = path[h][2-k];
+                            }
+                        }
+                    }
+                    else {
+                    	int[][] path = this.board[i][j].getPath();
+                        for (int k = 0; k < 3; k++) {
+                            for (int h = 0; h < 3; h++) {
+                                playerIntBoard[i * 3 + k][j * 3 + h] = EMPTY;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return playerIntBoard; }
 	
 	public SaboteurTile[][] getHiddenBoard(){
 		// returns the board in SaboteurTile format, where the objectives become the 8 tiles.
@@ -849,6 +899,7 @@ public class SaboteurBoardStateClone extends BoardState {
 		return false;
 	}
 
+	
 	public Boolean cardPath(ArrayList<int[]> originTargets,int[] targetPos,Boolean usingCard){
 		// the search algorithm, usingCard indicate weither we search a path of cards (true) or a path of ones (aka tunnel)(false).
 		ArrayList<int[]> queue = new ArrayList<>(); //will store the current neighboring tile. Composed of position (int[]).
@@ -882,7 +933,7 @@ public class SaboteurBoardStateClone extends BoardState {
 			}
 		}
 	}
-	private boolean pathToHidden(SaboteurTile[] objectives){
+	public boolean pathToHidden(SaboteurTile[] objectives){
 		/* This function look if a path is linking the starting point to the states among objectives.
             :return: if there exists one: true
                      if not: false
@@ -939,7 +990,7 @@ public class SaboteurBoardStateClone extends BoardState {
 				}
 			}
 			else{
-				System.out.println("hidden already revealed");
+				System.out.println("hidden already revealed clone");
 				atLeastOnefound = true;
 			}
 		}

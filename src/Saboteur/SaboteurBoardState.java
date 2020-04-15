@@ -867,7 +867,7 @@ public class SaboteurBoardState extends BoardState {
             }
         }
     }
-    private boolean pathToHidden(SaboteurTile[] objectives){
+    public boolean pathToHidden(SaboteurTile[] objectives){
         /* This function look if a path is linking the starting point to the states among objectives.
             :return: if there exists one: true
                      if not: false
