@@ -56,20 +56,30 @@ public class MyTools {
 			else return 100;
 		}
 
-		/*Destroy the cards that are playing outwards (away from the path from entrance to hidden objective 
-		 *giving more priority to the tiles closer to hidden objective
+		/*Destroy the cards that are deadends and blocking a path from origin to a hidden tile
 		 */
 		else if (cardPlayed instanceof SaboteurDestroy) {
 
 			int xpos = move.getPosPlayed()[0];
 			int ypos = move.getPosPlayed()[1];
+			
+			ArrayList<int[]> originTargets = new ArrayList<int[]>();
+			for (int[] pos : hiddenPos) originTargets.add(pos);
+			int[] targetPos = {5, 5};
+			boolean cardPathUsingCard = boardState.cardPath(originTargets, targetPos, true);
+			boolean cardPathUsing1 = boardState.cardPath(originTargets, targetPos, false);
 
-			if(boardState.getHiddenBoard()[xpos][ypos]!=null) {
-
-				if(playedInwards(move, boardState)) return -100;
-				else return 100;
+			// if there is a card path from origin to a hidden tile but there is no path of 1s, then 
+			// we can say that the road is blocked by a deadend card, we should remove it.
+			// Note the exclusive or (we want either one or the other, but not both at same time)
+			
+			if (cardPathUsingCard ^ cardPathUsing1) {
+				// get the tile at the position of the Destroy card
+				SaboteurTile tile = boardState.getBoardForDisplay()[xpos][ypos];
+				// third priority are deadends and have score 0
+				if (opening_map.get(tile.getIdx()) == 0) return 10000000;
 			}
-
+			return 0;
 		}
 
 		/* The heuristic for a card is slightly more complex. It considers

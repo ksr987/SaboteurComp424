@@ -37,6 +37,20 @@ public class StudentPlayer extends SaboteurPlayer {
      */
     public Move chooseMove(SaboteurBoardState boardState) {
     	
+    	/*
+    	 * Debugging space
+    	 */
+    	int[] origin = {5, 5};
+    	ArrayList<int[]> card = new ArrayList<int[]>();
+    	int[] posPlayed = {5, 4};
+    	card.add(posPlayed);
+    	// there should definitely be a path of card and 1 for those straight tunnel things especially at beginning,
+    	// so both should return true, but they don't
+		System.out.println("There is a path of cards? " + boardState.cardPath(card, origin, true));
+		System.out.println("There is a path of 1s? " + boardState.cardPath(card, origin, false));
+    	
+		// end of debugging space
+		
     	//add priorities of tiles in the hashmap
     	if (MyTools.opening_map.isEmpty()) MyTools.addPriorityTiles();
     	
