@@ -18,6 +18,7 @@ public class StudentPlayer extends SaboteurPlayer {
 	private static final String KETAN_SID = "260732873";
 	private static final String ALAIN_SID = "260714615";
 	
+	public static int ourPlayerId = -1;
 	private static final int timeout = 2;
 	
     /**
@@ -38,7 +39,7 @@ public class StudentPlayer extends SaboteurPlayer {
     public Move chooseMove(SaboteurBoardState boardState) {
     	
     	//add priorities of tiles in the hashmap
-    	if (MyTools.map.isEmpty()) MyTools.addPriorityTiles();
+    	if (MyTools.opening_map.isEmpty()) MyTools.addPriorityTiles();
     	
     	long initial = System.currentTimeMillis();
     	

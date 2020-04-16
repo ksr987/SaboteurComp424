@@ -16,18 +16,21 @@ import Saboteur.cardClasses.SaboteurTile;
 
 public class MyTools {
 
-	static HashMap<String, Integer> map = new HashMap<String, Integer>();
+	static HashMap<String, Double> map = new HashMap<String, Double>();
+	static HashMap<String, Double> opening_map = new HashMap<String, Double>();
 	static ArrayList<String> row_12_priority = new ArrayList<String>();
-	
+
 
 	/*
 	 * hiddenPos: position of hidden objectives in the board
 	 * LOW_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY: Priorities set for different types of tiles  
 	 */
 	static int[][] hiddenPos = {{12,3},{12,5},{12,7}};
-	final double LOW_PRIORITY = 0.0;
-	final double MEDIUM_PRIORITY = 50.0;
-	final double HIGH_PRIORITY = 100.0;
+	final static double LOW_PRIORITY = 0.0;
+	final static double MEDIUM_PRIORITY = 25.0;
+	final static double HIGH_PRIORITY = 50.0;
+	final static double EXTREMELY_HIGH_PRIORITY = 100;
+	final static int MIDGAME = 25;
 
 	//Evaluation function that returns the heuristic of a legal move based on the board state
 	public static double evaluateGreedyMove(Node node, SaboteurMove move) {
@@ -41,7 +44,7 @@ public class MyTools {
 		 * It is more important than a map
 		 */
 		if (cardPlayed instanceof SaboteurBonus)
-			return 100000;
+			return EXTREMELY_HIGH_PRIORITY;
 
 		/* For Map, it would matter way more to play it when the nugget is not revealed yet, 
 		 * and would not have any use otherwise
@@ -54,7 +57,7 @@ public class MyTools {
 				if (move.getPosPlayed()[0] == hiddenPos[i][0] && move.getPosPlayed()[1] == hiddenPos[i][1])
 					positionPlayed = i;
 			}
-			// very confusing, but if we see current board state, the card has already been played so it's already
+			// confusing, but if we see current board state, the card has already been played so it's already
 			// revealed. Therefore, should look at two states above to get our state the turn before (we have to look
 			// one more up as we cannot see our cards from the opponent's perspective during his turn)
 			try {
@@ -77,7 +80,7 @@ public class MyTools {
 			//			}
 			//			if (clonedState.getTurnPlayer() == 1 && clonedState.player1hiddenRevealed[positionPlayed]) continue;
 			//			if (clonedState.getTurnPlayer() == 2 && clonedState.player2hiddenRevealed[positionPlayed]) continue;
-			return 10000; 
+			return 100; 
 		}
 
 		/* For Malus, it is a sounder idea to play it towards the end, because at the beginning we 
@@ -86,22 +89,23 @@ public class MyTools {
 		 * throughout the game because they are not as high of a priority, so it may be scarce of it by the end.
 		 */
 		else if (cardPlayed instanceof SaboteurMalus) {
-			if (boardState.getTurnNumber() < 30) return 0;
-			else return 100;
+			if (boardState.getTurnNumber() < MIDGAME) return 0;
+			return HIGH_PRIORITY;
 		}
 
 		/* For Drop, if you have Map, and nugget is revealed, it doesn't make sense to have it
 		 * Same for deadends, they're just going to block path
 		 */
 		else if (cardPlayed instanceof SaboteurDrop) {
-			SaboteurCard cardDropped = boardState.getCurrentPlayerCards().get(move.getPosPlayed()[0]);
+			SaboteurCard cardDropped = node.getParent().getState().getCurrentPlayerCards().get(move.getPosPlayed()[1]);
+			
 			if (cardDropped instanceof SaboteurMap && boardState.isNuggetFound()) {
-				return 10000000;
+				return EXTREMELY_HIGH_PRIORITY;
 			}
 			else if (cardDropped instanceof SaboteurTile) {
 				String index = ((SaboteurTile) cardDropped).getIdx();
-				if (map.get(index) == 0) {
-					return 10;
+				if (map.get(index) == LOW_PRIORITY) {
+					return EXTREMELY_HIGH_PRIORITY;
 				}
 			}
 		}
@@ -134,14 +138,14 @@ public class MyTools {
 			SaboteurTile cardPlayedOn = parentBoardState.getBoardForDisplay()[move.getPosPlayed()[0]][move.getPosPlayed()[1]];
 			if (move.getPosPlayed()[0] == 12 && !row_12_priority.contains(cardPlayedOn.getIdx())) return 1000000000;
 			if (map.get(cardPlayedOn.getIdx()) == 0) // we know it's 0 priority, deadend
-				// TODO: better design, add "isInSquare" method
-				if (move.getPosPlayed()[0] > 5 && move.getPosPlayed()[1] >= 3 && move.getPosPlayed()[1] <= 7) {
-//					ArrayList<int[]> originTargets = new ArrayList<int[]>();
-//					for (int[] pos : hiddenPos) originTargets.add(pos);
-//					int[] targetPos = new int[] {5, 5};
-//					boolean cardPath = boardState.cardPath(originTargets, targetPos, true);
-//					if (cardPath) 
-					return 100000000;
+				// TODO: better design, add "isInSquare" method.
+				if (move.getPosPlayed()[0] > 5) {
+					//					ArrayList<int[]> originTargets = new ArrayList<int[]>();
+					//					for (int[] pos : hiddenPos) originTargets.add(pos);
+					//					int[] targetPos = new int[] {5, 5};
+					//					boolean cardPath = boardState.cardPath(originTargets, targetPos, true);
+					//					if (cardPath) 
+					return EXTREMELY_HIGH_PRIORITY;
 				}
 		}
 
@@ -164,8 +168,9 @@ public class MyTools {
 			originTargets.add(pos);
 			int[] targetPos = move.getPosPlayed();
 
-			if (isSuperMove(boardState, move)) return 1000000;
+			if (isSuperMove(boardState, move)) return EXTREMELY_HIGH_PRIORITY;
 
+			
 			boolean cardPath = boardState.cardPath(originTargets, targetPos, true);
 
 			if (cardPath) beginningPosition = move.getPosPlayed();
@@ -180,11 +185,11 @@ public class MyTools {
 			distance = Math.sqrt(Math.pow(endPosition[1] - beginningPosition[1], 2) + Math.pow(endPosition[0] - beginningPosition[0], 2));
 
 			String idx = ((SaboteurTile) cardPlayed).getIdx();
-			int priority = map.get(idx);
+			double priority = map.get(idx);
 			boolean isInwards = playedInwards(move, boardState);
-
-			if (isInwards) return priority / distance;
-			return 0;
+			
+			
+			if (isInwards) return priority/distance;
 		}
 		return 0;
 	}
@@ -205,18 +210,18 @@ public class MyTools {
 				if (index == "8" || index == "9" || index == "9_flip" || index == "7" || index == "10" || index == "7_flip" || index == "5_flip" || index == "7" || index == "5") return true;		
 			}
 		}
-//		if (yPos == 11) {
-//			if (xPos < 3) {
-//				if (index == "0" || index == "6_flip" || index == "7" || index == "8") return true;		
-//			}
-//			if (xPos > 7) {
-//				if (index == "0" || index == "6_flip" || index == "7" || index == "8") return true;		
-//			}
-//			else {
-//				if (index == "0" || index == "9_flip" || index == "7" || index == "8") return true;		
-//
-//			}
-//		}
+		//		if (yPos == 11) {
+		//			if (xPos < 3) {
+		//				if (index == "0" || index == "6_flip" || index == "7" || index == "8") return true;		
+		//			}
+		//			if (xPos > 7) {
+		//				if (index == "0" || index == "6_flip" || index == "7" || index == "8") return true;		
+		//			}
+		//			else {
+		//				if (index == "0" || index == "9_flip" || index == "7" || index == "8") return true;		
+		//
+		//			}
+		//		}
 
 		return false;
 	}
@@ -237,18 +242,18 @@ public class MyTools {
 		//consider only 3 edges as the common edge can be flexible
 
 		//top edge
-		if(move.getPosPlayed()[1]<=5 && !(leftMiddleOpen || rightMiddleOpen || bottomMiddleOpen) && topMiddleOpen) return false;
+		if(move.getPosPlayed()[0]<=5 && !(leftMiddleOpen || rightMiddleOpen || bottomMiddleOpen) && topMiddleOpen) return false;
 
 		//left edge
-		if(move.getPosPlayed()[0]<=3 && !(topMiddleOpen || rightMiddleOpen || bottomMiddleOpen) && leftMiddleOpen) return false;
+		if(move.getPosPlayed()[1]<=3 && !(topMiddleOpen || rightMiddleOpen || bottomMiddleOpen) && leftMiddleOpen) return false;
 
 		//bottom edge
-		if(move.getPosPlayed()[1]>=12 && !(topMiddleOpen || rightMiddleOpen || leftMiddleOpen) && bottomMiddleOpen) return false;
+		if(move.getPosPlayed()[0]>=12 && !(topMiddleOpen || rightMiddleOpen || leftMiddleOpen) && bottomMiddleOpen) return false;
 
 		//right square
 
 		//right edge
-		if(move.getPosPlayed()[0]>=7 && !(topMiddleOpen || leftMiddleOpen || bottomMiddleOpen) && rightMiddleOpen) return false;
+		if(move.getPosPlayed()[1]>=7 && !(topMiddleOpen || leftMiddleOpen || bottomMiddleOpen) && rightMiddleOpen) return false;
 
 		return true;
 	}
@@ -365,51 +370,51 @@ public class MyTools {
 
 		}
 		int winner = clonedState.getWinner();
-		if (winner == currentNode.getState().getTurnPlayer()) {
-			return 1;	// our player won
-		}
+		if (winner == currentNode.getState().getTurnPlayer()) return 1;	// our player won
 		else if (winner == Integer.MAX_VALUE) return 0.5;	// it's a draw
 		else return 0; //our player lost
 	}
 
-	/**
-	 * Backpropagate the result of the playout to all the nodes until we reach root node
-	 * @param currentNode
-	 * @param playoutResult
-	 */
-	public static void MCTS_Backpropagation(Node currentNode, double playoutResult) {
-		Node tempNode = currentNode;
-		while (tempNode != null) {
-			tempNode.setVisitCount(tempNode.getVisitCount() + 1);
+/**
+ * Backpropagate the result of the playout to all the nodes until we reach root node
+ * @param currentNode
+ * @param playoutResult
+ */
+public static void MCTS_Backpropagation(Node currentNode, double playoutResult) {
+	Node tempNode = currentNode;
+	while (tempNode != null) {
+		tempNode.setVisitCount(tempNode.getVisitCount() + 1);
 
-			if(playoutResult==0.5) {
-				tempNode.setWinScore(tempNode.getWinScore()+0.5);
-			}
-			// playoutResult is the ID of the player that won
-			else if (tempNode.getState().getTurnPlayer() == playoutResult) {
-				tempNode.setWinScore(tempNode.getWinScore() + 1);
-			}
-			tempNode = tempNode.getParent();	
+		if(playoutResult==0.5) {
+			tempNode.setWinScore(tempNode.getWinScore()+0.5 * tempNode.heuristic);
 		}
+		// playoutResult is the ID of the player that won
+		else if (tempNode.getState().getTurnPlayer() == playoutResult) {
+			tempNode.setWinScore(tempNode.getWinScore() + 1 * tempNode.heuristic);
+		}
+		tempNode = tempNode.getParent();	
 	}
+}
 
-	/**
-	 * Add priority of the tiles based on if it leads to continuous path or blocked path
-	 * we split them into three categories of priority i.e. the more versatile ones, the deadends, 
-	 * and the rest (at priority 2)
-	 */
-	public static void addPriorityTiles() {
+/**
+ * Add priority of the tiles based on if it leads to continuous path or blocked path
+ * we split them into three categories of priority i.e. the more versatile ones, the deadends, 
+ * and the rest (at priority 2)
+ */
+public static void addPriorityTiles() {
 
-		//add indexes of tiles in different priority lists
-		String[] firstPriority = {"0", "5", "6", "8", "9", "10", "6_flip", "7_flip"};
-		String[] secondPriority = {"5_flip", "7", "9_flip", "1"};
-		String[] thirdPriority = {"2", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "14", "14_flip", "15", "13"};
+	//add indexes of tiles in different priority lists
+	String[] versatiles = {"0", "5", "6", "8", "9", "6_flip", "7_flip"};
+	String[] rest = {"10", "5_flip", "7", "9_flip"};
+	String[] deadends = {"2", "1", "2_flip", "3", "3_flip", "4", "4_flip", "11", "11_flip", "12", "12_flip", "14", "14_flip", "15", "13"};
 
-		for(String tile: firstPriority) map.put(tile, 100);
-		for(String tile: secondPriority) map.put(tile, 50);
-		for(String tile: thirdPriority) map.put(tile, 0);		
-		
-		String[] arr = {"8", "9", "9_flip", "7", "10", "7_flip", "5_flip", "7", "5"};
-		for (String a : arr) row_12_priority.add(a);
+	for(String tile: versatiles) map.put(tile, HIGH_PRIORITY);
+	for(String tile: rest) map.put(tile, MEDIUM_PRIORITY);
+	for(String tile: deadends) map.put(tile, LOW_PRIORITY);		
+
+	String[] arr = {"8", "9", "9_flip", "7", "10", "7_flip", "5_flip", "7", "5"};
+	for (String a : arr) row_12_priority.add(a);
+	
+	//add indexes of tiles in different priority lists
 	}
 }
