@@ -117,6 +117,12 @@ public class SaboteurBoardStateClone extends BoardState {
 			for (SaboteurCard card : player1Cards) {
 				deck.remove(card);
 			}
+			SaboteurTile[][] tiles = boardState.getBoardForDisplay();
+			for (int i = 0; i < tiles.length; i++) {
+				for (int j = 0; j < tiles[i].length; j++) {
+					if (tiles[i][j] != null && tiles[i][j].getIdx()!="entrance" && tiles[i][j].getIdx()!="goalTile") deck.remove(tiles[i][j]);
+				}
+			}
 			//initialize the players hands:
 			this.player2Cards = new ArrayList<SaboteurCard>();
 			for(int i=0;i<7;i++){
@@ -128,6 +134,12 @@ public class SaboteurBoardStateClone extends BoardState {
 			ArrayList<SaboteurCard> deck = SaboteurCard.getDeck();
 			for (SaboteurCard card : player2Cards) {
 				deck.remove(card);
+			}
+			SaboteurTile[][] tiles = boardState.getBoardForDisplay();
+			for (int i = 0; i < tiles.length; i++) {
+				for (int j = 0; j < tiles[i].length; j++) {
+					if (tiles[i][j] != null && tiles[i][j].getIdx()!="entrance" && tiles[i][j].getIdx()!="goalTile") deck.remove(tiles[i][j]);
+				}
 			}
 			this.player1Cards = new ArrayList<SaboteurCard>();
 			for(int i=0;i<7;i++){
@@ -214,6 +226,12 @@ public class SaboteurBoardStateClone extends BoardState {
 			for (SaboteurCard card : player1Cards) {
 				deck.remove(card);
 			}
+			SaboteurTile[][] tiles = boardState.getBoardForDisplay();
+			for (int i = 0; i < tiles.length; i++) {
+				for (int j = 0; j < tiles[i].length; j++) {
+					if (tiles[i][j] != null) deck.remove(tiles[i][j]);
+				}
+			}
 			//initialize the players hands:
 			this.player2Cards = new ArrayList<SaboteurCard>();
 			for(int i=0;i<7;i++){
@@ -225,6 +243,12 @@ public class SaboteurBoardStateClone extends BoardState {
 			ArrayList<SaboteurCard> deck = SaboteurCard.getDeck();
 			for (SaboteurCard card : player2Cards) {
 				deck.remove(card);
+			}
+			SaboteurTile[][] tiles = boardState.getBoardForDisplay();
+			for (int i = 0; i < tiles.length; i++) {
+				for (int j = 0; j < tiles[i].length; j++) {
+					if (tiles[i][j] != null) deck.remove(tiles[i][j]);
+				}
 			}
 			this.player1Cards = new ArrayList<SaboteurCard>();
 			for(int i=0;i<7;i++){
